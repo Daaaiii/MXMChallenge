@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { Subscription } from 'rxjs';
 import { passwordComplexityValidator } from '../../utils/validators/checkPassword';
@@ -12,12 +12,13 @@ import { nameValidator } from '../../utils/validators/checkName';
 import { phoneValidator } from '../../utils/validators/checkPhone';
 import { FormService } from '../../services/form.service';
 import { SearchCepService } from '../../services/search-cep.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective],
+  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective, NavbarComponent, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
   providers:[provideNgxMask()]
@@ -31,6 +32,8 @@ export class RegisterComponent {
     private router: Router
   ) {}
 
+  page= 'Login';
+  route= '/home';
   form!: FormGroup;
   errorMessage: string | null = '';
   formSubscription: Subscription | undefined;

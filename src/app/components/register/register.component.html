@@ -1,3 +1,4 @@
+<app-navbar [page]="page" [route]="route"></app-navbar>
 <div class="container mt-5 mb-5">
     <section class="row">
       <form
@@ -440,6 +441,7 @@
   
         <div class="row">
           <div class="offset-md-2 col-md-8 mb-3">
+            
             <div class="d-grid gap-2">
               <button
                 type="submit"
@@ -448,6 +450,9 @@
               >
                 Cadastrar
               </button>
+              <p class="mt-2">
+                Já está cadastrado? <a routerLink="/home">Clique Aqui.</a>
+              </p>
             </div>
           </div>
         </div>
