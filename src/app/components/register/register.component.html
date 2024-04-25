@@ -1,1 +1,457 @@
-<p>register works!</p>
+<div class="container mt-5 mb-5">
+    <section class="row">
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="row">
+          <div class="offset-md-2 col-md-8">
+            <div class="form-group mb-3">
+              <label for="name" class="form-label">Nome completo</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="name"
+                id="name"
+                placeholder="Digite seu nome"
+                [class.is-invalid]="
+                  form.get('name')?.invalid &&
+                  (form.get('name')?.dirty || form.get('name')?.touched)
+                "
+                required
+              />
+              <div
+                *ngIf="
+                  form.get('name')?.invalid &&
+                  (form.get('name')?.dirty || form.get('name')?.touched)
+                "
+                class="invalid-feedback"
+              >
+                <div *ngIf="form.get('name')?.errors?.['nameInvalid']">
+                  <div
+                    *ngIf="form.get('name')?.errors?.['reason'] === 'Not enough words'"
+                  >
+                    Por favor, informe seu nome e sobrenome.
+                  </div>
+                  <div
+                    *ngIf="form.get('name')?.errors?.['reason'] === 'Word too short'"
+                  >
+                    Cada nome/sobrenome deve ter pelo menos 3 letras.
+                  </div>
+                  <div
+                    *ngIf="form.get('name')?.errors?.['reason'] === 'Invalid characters'"
+                  >
+                    O nome não pode conter símbolos e números.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center">
+          <div class="offset-md-2 col-md-2 mb-3">
+            <label for="DDD" class="form-label">DDD</label>
+            <select
+              class="form-select"
+              size="1"
+              formControlName="ddd"
+              id="DDD"
+              [class.is-invalid]="
+                form.get('ddd')?.invalid &&
+                (form.get('ddd')?.dirty || form.get('ddd')?.touched)
+              "
+              required
+            >
+              <option value="" selected>Selecione</option>
+              <option *ngFor="let ddd of ddds" [value]="ddd">{{ ddd }}</option>
+            </select>
+            <div
+              *ngIf="
+                form.get('ddd')?.invalid &&
+                (form.get('ddd')?.dirty || form.get('ddd')?.touched)
+              "
+              class="invalid-feedback"
+            >
+              Por favor, selecione um DDD.
+            </div>
+          </div>
+  
+          <div class="col-md-6 mb-3">
+            <label for="phone" class="form-label">Telefone</label>
+            <input
+              type="tel"
+              class="form-control"
+              id="phone"
+              mask="0 0000-0000"
+              formControlName="phone"
+              placeholder="Digite seu telefone"
+              [class.is-invalid]="
+                form.get('phone')?.invalid &&
+                (form.get('phone')?.dirty || form.get('phone')?.touched)
+              "
+              required
+            />
+            <div
+              *ngIf="
+                form.get('phone')?.invalid &&
+                (form.get('phone')?.dirty || form.get('phone')?.touched)
+              "
+              class="invalid-feedback"
+            >
+              <div *ngIf="form.get('phone')?.errors?.['phoneInvalid']">
+                Número de telefone inválido.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="offset-md-2 col-md-8 mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              placeholder="Digite seu email"
+              [class.is-invalid]="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['userEmailExists']"
+              required
+            />
+            <span *ngIf="form.errors?.['userEmailExists']" class="text-danger"
+              >Email já cadastrado.</span
+            >
+            <div
+              *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['emailExists']"
+              class="invalid-feedback"
+            >
+              <div *ngIf="form.get('email')?.errors?.['required']">
+                Informe seu email.
+              </div>
+              <div *ngIf="form.get('email')?.errors?.['email']">
+                Informe um endereço de email válido.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="offset-md-2 col-md-8 mb-3">
+            <label for="CPF_CNPJ" class="form-label">CPF ou CNPJ</label>
+            <input
+              type="text"
+              class="form-control"
+              id="cpf_cnpj"
+              inputmode="numeric"
+              mask="CPF_CNPJ"
+              formControlName="cpf_cnpj"
+              aria-describedby="cpf_cnpj"
+              placeholder="Informe seu CPF ou CNPJ"
+              [class.is-invalid]="form.get('cpf_cnpj')?.invalid && (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched) ||form.errors?.['userCPFExists']"
+              required
+            />
+            <span *ngIf="form.errors?.['userCPFExists']" class="text-danger"
+              >CPF já cadastrado.</span
+            >
+  
+            <div
+              *ngIf="
+                form.get('cpf_cnpj')?.invalid &&
+                (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched)
+              "
+              class="invalid-feedback"
+            >
+              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCpf'] "
+                >CPF inválido</span
+              >
+              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCpfCnpj']"
+                >O valor deve ser um CPF ou CNPJ válido.</span
+              >
+              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCnpj']"
+                >CNPJ inválido.</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="offset-md-2 col-md-8 mb-3">
+            <label for="password" class="form-label">Senha</label>
+            <div class="input-group">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-control"
+                formControlName="password"
+                id="password"
+                placeholder="Digite sua senha"
+                [class.is-invalid]="
+                  form.get('password')?.invalid &&
+                    (form.get('password')?.dirty ||
+                  form.get('password')?.touched)
+                "
+                required
+              />
+              <span class="input-group-text">
+                <i
+                  class="bi"
+                  [class.bi-eye-fill]="!showPassword"
+                  [class.bi-eye-slash-fill]="showPassword"
+                  (click)="showPassword = !showPassword"
+                ></i>
+              </span>
+              <div
+                *ngIf="
+                  form.get('password')?.invalid &&
+                  (form.get('password')?.dirty || form.get('password')?.touched)
+                "
+                class="invalid-feedback"
+              >
+                <div *ngIf="form.get('password')?.errors?.['required']">
+                  Informe sua senha.
+                </div>
+                <div *ngIf="form.get('password')?.errors?.['maxLength']"
+                > {{ form.get('password')?.errors?.['maxLength'] }}</div>  
+                <div *ngIf="form.get('password')?.errors?.['uppercaseRequired']">
+                  {{ form.get('password')?.errors?.['uppercaseRequired'] }}
+                </div>
+                <div *ngIf="form.get('password')?.errors?.['lowercaseRequired']">
+                  {{ form.get('password')?.errors?.['lowercaseRequired'] }}
+                </div>
+                <div *ngIf="form.get('password')?.errors?.['numericRequired']">
+                  {{ form.get('password')?.errors?.['numericRequired'] }}
+                </div>
+                <div
+                  *ngIf="form.get('password')?.errors?.['specialCharRequired']"
+                >
+                  {{ form.get('password')?.errors?.['specialCharRequired'] }}
+                </div>
+                <div *ngIf="form.get('password')?.errors?.['minLengthRequired']">
+                  {{ form.get('password')?.errors?.['minLengthRequired'] }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="offset-md-2 col-md-8 mb-3">
+            <label for="confirm-password" class="form-label"
+              >Confirme sua senha</label
+            >
+            <div class="input-group">
+              <input
+                [type]="showPasswordConfirmation ? 'text' : 'password'"
+                class="form-control"
+                formControlName="confirmPassword"
+                id="confirmPassword"
+                placeholder="Confirme sua senha"
+                [class.is-invalid]="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
+                required
+              />
+              <span class="input-group-text">
+                <i
+                  class="bi"
+                  [class.bi-eye-fill]="!showPasswordConfirmation"
+                  [class.bi-eye-slash-fill]="showPasswordConfirmation"
+                  (click)="showPasswordConfirmation = !showPasswordConfirmation"
+                ></i>
+              </span>
+              <div
+                *ngIf="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
+                class="invalid-feedback"
+              >
+                A senha informada deve ser igual a senha anterior.
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="offset-md-2 col-md-4 mb-3">
+            <label for="zipcode" class="form-label">CEP</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="zipcode"
+                id="zipcode"
+                mask="00000-000"
+                placeholder="Digite o seu CEP"
+                [class.is-invalid]="
+                  form.get('zipcode')?.invalid &&
+                  (form.get('zipcode')?.dirty || form.get('zipcode')?.touched)
+                "
+                required
+              />
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                (click)="searchCEP()"
+              >
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+            <div
+              *ngIf="
+                form.get('zipcode')?.invalid &&
+                (form.get('zipcode')?.dirty || form.get('zipcode')?.touched)
+              "
+              class="invalid-feedback"
+            >
+              Formato de CEP inválido. O CEP deve conter exatamente 8 dígitos
+              numéricos.
+            </div>
+            <div *ngIf="searchAttempted">
+              <div *ngIf="errorMessage" class="invalid-feedback d-block">
+                {{ errorMessage }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="state" class="form-label">UF</label>
+            <select
+              type="text"
+              class="form-control"
+              formControlName="state"
+              id="state"
+              placeholder="Selecione a sua unidade federativa"
+              [class.is-invalid]="
+                form.get('state')?.invalid &&
+                (form.get('state')?.dirty || form.get('state')?.touched)
+              "
+              required
+            >
+              <option value="" selected>Selecione</option>
+              <option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</option>
+            </select>
+            <div
+              *ngIf="
+                form.get('state')?.invalid &&
+                (form.get('state')?.dirty || form.get('state')?.touched)
+              "
+              class="invalid-feedback"
+            ></div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="offset-md-2 col-md-6 mb-3">
+            <label for="street" class="form-label">Logradouro | Rua</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="street"
+              id="street"
+              placeholder="Digite o logradouro."
+              [class.is-invalid]="
+                form.get('street')?.invalid &&
+                (form.get('street')?.dirty || form.get('street')?.touched)
+              "
+              required
+            />
+            <div
+              *ngIf="
+                form.get('street')?.invalid &&
+                (form.get('street')?.dirty || form.get('street')?.touched)
+              "
+              class="invalid-feedback"
+            ></div>
+          </div>
+          <div class="col-md-2 mb-3">
+            <label for="number" class="form-label">Número</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="number"
+              id="number"
+              placeholder="Digite o número do endereço."
+              [class.is-invalid]="
+                form.get('number')?.invalid &&
+                (form.get('number')?.dirty || form.get('number')?.touched)
+              "
+              required
+            />
+            <div
+              *ngIf="
+                form.get('number')?.invalid &&
+                (form.get('number')?.dirty || form.get('number')?.touched)
+              "
+              class="invalid-feedback"
+            ></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="offset-md-2 col-md-4 mb-3">
+            <label for="city" class="form-label">Cidade</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="city"
+              id="city"
+              placeholder="Digite o nome da cidade."
+              [class.is-invalid]="
+                form.get('city')?.invalid &&
+                (form.get('city')?.dirty || form.get('city')?.touched)
+              "
+              required
+            />
+            <div
+              *ngIf="
+                form.get('city')?.invalid &&
+                (form.get('city')?.dirty || form.get('city')?.touched)
+              "
+              class="invalid-feedback"
+            ></div>
+          </div>
+  
+          <div class="col-md-4 mb-3">
+            <label for="neighborhood" class="form-label">Bairro</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="neighborhood"
+              id="neighborhood"
+              placeholder="Digite o nome do bairro."
+              [class.is-invalid]="
+                form.get('neighborhood')?.invalid &&
+                (form.get('neighborhood')?.dirty ||
+                  form.get('neighborhood')?.touched)
+              "
+              required
+            />
+            <div
+              *ngIf="
+                form.get('neighborhood')?.invalid &&
+                (form.get('neighborhood')?.dirty ||
+                  form.get('neighborhood')?.touched)
+              "
+              class="invalid-feedback"
+            ></div>
+          </div>
+  
+          <div class="offset-md-2 col-md-8 mb-3">
+            <label for="complement" class="form-label">Complemento</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="complement"
+              id="complement"
+              placeholder="Digite o complemento do endereço."
+            />
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="offset-md-2 col-md-8 mb-3">
+            <div class="d-grid gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary mt-3 w-100"
+                [disabled]="form.invalid"
+              >
+                Cadastrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+  
