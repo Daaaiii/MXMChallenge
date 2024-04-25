@@ -1,0 +1,18 @@
+.home-image {
+    width: 100%;
+    height: auto;
+    max-height: 600px; 
+  }
+  
+  @media (max-width: 768px) {
+    .home-image {
+      max-height: 300px; 
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .home-image {
+      max-height: 200px; 
+    }
+  }
+  
