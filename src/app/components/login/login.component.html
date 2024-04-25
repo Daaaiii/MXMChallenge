@@ -1,1 +1,57 @@
-<p>login works!</p>
+<div class="container-fluid">
+    <div class="row align-items-center mt-5">
+      <h1>Login</h1>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
+        <div class="form-group offset-md-2 col-md-8 mb-3">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            formControlName="email"
+            required
+          />
+          <div
+            *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+            class="invalid-feedback"
+          >
+            Email inválido
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group offset-md-2 col-md-8 mb-3">
+            <label for="password">Password</label>
+            <div class="input-group">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-control"
+                id="password"
+                formControlName="password"
+                required
+              />
+              <span class="input-group-text" (click)="showPassword = !showPassword">
+                <i
+                  class="bi"
+                  [class.bi-eye-fill]="!showPassword"
+                  [class.bi-eye-slash-fill]="showPassword"
+                ></i>
+              </span>
+            </div>
+            <div
+              *ngIf="
+                form.get('password')?.invalid && form.get('password')?.touched
+              "
+              class="invalid-feedback"
+            >
+              Senha inválida
+            </div>
+          </div>
+        </div>
+        <p class="mt-2">
+          Ainda não está cadastrado? <a routerLink="/register">Clique Aqui.</a>
+        </p>
+        <button type="submit" class="btn btn-primary mt-2" [disabled]="form.invalid">Login</button>
+      </form>
+    </div>
+  </div>
+  
