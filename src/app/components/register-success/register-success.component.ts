@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-success',
@@ -9,5 +9,11 @@ import { RouterLink } from '@angular/router';
   styleUrl: './register-success.component.css'
 })
 export class RegisterSuccessComponent {
+  constructor(private router: Router) { }
 
+  ngOnInit() {
+    setTimeout(() => {
+      this.router.navigate(['/']); 
+    }, 5000); 
+  }
 }
