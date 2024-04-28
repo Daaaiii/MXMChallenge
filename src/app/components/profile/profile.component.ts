@@ -6,6 +6,7 @@ import { RegisterDTO } from '../../models/registerDTO';
 import { ReactiveFormsModule } from '@angular/forms';
 
 
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -18,33 +19,15 @@ export class ProfileComponent {
  
   
   constructor(private authService: AuthService, private router:Router) {}
-
-
   page= 'Logout';
   route= '/home';
+
   username:string = localStorage.getItem('User') || '';
   user: RegisterDTO = {} as RegisterDTO;
+
   ngOnInit() {
     this.getUserInfo();
   }
-  onLogout() {
-    this.authService.logout();
-  }
-
-  
-  deleteProfile() {
-    if (this.authService.isLoggedIn()) { 
-    this.authService.deleteProfile().subscribe({
-      next: () => {
-        alert('Profile deleted');
-        this.router.navigate(['/home']);
-      },
-      error: (err) => console.error('Deletion failed', err)
-    })} else {
-      console.error('Authentication token missing');
-    }
-  }
-
   getUserInfo() {
     if (this.authService.isLoggedIn()) {  
       this.authService.getProfile() 
@@ -55,6 +38,14 @@ export class ProfileComponent {
     } else {
       console.error('Authentication token missing');
     }
+  }
+  onLogout() {
+    this.authService.logout();
+  }  
+
+  deleteProfile() {
+    this.router.navigate(['/delete']);
+    
   }
 
   updateProfile() {
