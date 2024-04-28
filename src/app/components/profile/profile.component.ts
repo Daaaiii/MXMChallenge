@@ -19,8 +19,6 @@ export class ProfileComponent {
  
   
   constructor(private authService: AuthService, private router:Router) {}
-  page= 'Logout';
-  route= '/home';
 
   username:string = localStorage.getItem('User') || '';
   user: RegisterDTO = {} as RegisterDTO;
