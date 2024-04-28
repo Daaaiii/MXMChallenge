@@ -34,13 +34,13 @@ export const routes: Routes = [
             (m) => m.ProfileComponent
           ),
       },
-      // {
-      //   path: 'update',
-      //   loadComponent: () =>
-      //     import('./components/update/update.component').then(
-      //       (m) => m.UpdateComponent
-      //     ),
-      // },
+      {
+        path: 'welcome',
+        loadComponent: () =>
+          import('./components/welcome/welcome.component').then(
+            (m) => m.WelcomeComponent
+          ),
+      },
       {
         path: 'delete',
         loadComponent: () =>
