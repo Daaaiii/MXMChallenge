@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7045';
+  private apiUrl = 'https://testemxm.azurewebsites.net';
 
   constructor(private http: HttpClient, private router: Router) {}
 
