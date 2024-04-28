@@ -33,7 +33,22 @@ export const routes: Routes = [
           import('./components/profile/profile.component').then(
             (m) => m.ProfileComponent
           ),
+      },
+      // {
+      //   path: 'update',
+      //   loadComponent: () =>
+      //     import('./components/update/update.component').then(
+      //       (m) => m.UpdateComponent
+      //     ),
+      // },
+      {
+        path: 'delete',
+        loadComponent: () =>
+          import('./components/deleteprofile/deleteprofile.component').then(
+            (m) => m.DeleteprofileComponent
+          ),
       }
+     
       
     ],
   },
