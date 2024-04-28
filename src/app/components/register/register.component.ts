@@ -33,7 +33,7 @@ export class RegisterComponent {
     private router: Router,
     private authService: AuthService
   ) {}
-
+  isLoading = false;
   page= 'Login';
   route= '/home';
   form!: FormGroup;
@@ -83,21 +83,24 @@ export class RegisterComponent {
   onSubmit() {
     
     if (this.form.valid) {
+      this.isLoading = true;
       this.formCompleted.emit();
-      console.log('Form submitted:', this.form.value);
       this.authService.register(this.form.value).subscribe({
-        next: (response) => {
-          console.log('User registered:', response);           
+        next: () => {       
           this.router.navigate(['/register-success']);
         },
         error: (err) => {
-          console.error('Authentication error:', err);
-          this.errorMessage = 'Falha na autenticação. Por favor, verifique seus dados e tente novamente.';
-        }
+          this.errorMessage = err.error.message || 'Erro ao cadastrar usuário. Por favor, tente novamente.';
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
       });
       this.form.reset();
     } else {
       this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+      this.isLoading = false;
     }
   }
   

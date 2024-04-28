@@ -443,17 +443,19 @@
           <div class="offset-md-2 col-md-8 mb-3">
             
             <div class="d-grid gap-2">
-              <button
-                type="submit"
-                class="btn btn-primary mt-3 w-100"
-                [disabled]="form.invalid"
-              >
-                Cadastrar
+              <div *ngIf="errorMessage" class="alert alert-danger">
+                {{ errorMessage }}
+            </div>
+              <button type="submit" class="btn btn-primary mt-3 w-100" [disabled]="form.invalid || isLoading">
+                <span *ngIf="!isLoading">Cadastrar</span>
+                <span *ngIf="isLoading" class="spinner-grow spinner-grow-sm"  aria-hidden="true"></span>
+                <span *ngIf="isLoading" role="status">Loading...</span>
               </button>
               <p class="mt-2">
                 Já está cadastrado? <a routerLink="/home">Clique Aqui.</a>
               </p>
             </div>
+
           </div>
         </div>
       </form>

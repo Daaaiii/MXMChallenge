@@ -20,8 +20,13 @@ export class LoginComponent implements OnInit {
   form!: FormGroup;
   public showPassword: boolean = false;
   errorMessage: string | null = null;
+  isLoading: boolean = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -32,19 +37,24 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
+      this.isLoading = true;
       this.authService.authenticate(this.form.value).subscribe({
-        next: (response) => {
+        next: () => {
           this.router.navigate(['/profile']);
         },
         error: (err) => {
           console.error('Authentication error:', err);
-          this.errorMessage = 'Falha na autenticação. Por favor, verifique seus dados e tente novamente.';
-        }
+          this.errorMessage = 'Erro ao autenticar o usuário. Por favor, tente novamente.';
+            this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
       });
       this.form.reset();
     } else {
+      this.isLoading = false;
       this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
     }
-     
   }
 }

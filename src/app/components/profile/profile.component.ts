@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RegisterDTO } from '../../models/registerDTO';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [NavbarComponent, RouterLink, ReactiveFormsModule],
+  imports: [ RouterLink, ReactiveFormsModule, SidebarComponent],
 
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
@@ -39,10 +39,10 @@ export class ProfileComponent {
       console.error('Authentication token missing');
     }
   }
-  onLogout() {
+  onLogout():void {
     this.authService.logout();
   }  
-
+ 
   deleteProfile() {
     this.router.navigate(['/delete']);
     
