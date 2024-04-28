@@ -4,7 +4,7 @@ export interface RegisterDTO {
     email: string;
     ddd: number;
     phoneNumber: number;
-    cpf: string;
+    cpf_cnpj: string;
     zipcode: string;
     street: string;
     number: string;
