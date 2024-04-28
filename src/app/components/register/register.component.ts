@@ -13,6 +13,7 @@ import { phoneValidator } from '../../utils/validators/checkPhone';
 import { FormService } from '../../services/form.service';
 import { SearchCepService } from '../../services/search-cep.service';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -29,7 +30,8 @@ export class RegisterComponent {
     private formService: FormService,
     private cdr: ChangeDetectorRef,
     private cepService: SearchCepService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   page= 'Login';
@@ -82,16 +84,29 @@ export class RegisterComponent {
     
     if (this.form.valid) {
       this.formCompleted.emit();
+      console.log('Form submitted:', this.form.value);
+      this.authService.register(this.form.value).subscribe({
+        next: (response) => {
+          console.log('User registered:', response);           
+          this.router.navigate(['/register-success']);
+        },
+        error: (err) => {
+          console.error('Authentication error:', err);
+          this.errorMessage = 'Falha na autenticação. Por favor, verifique seus dados e tente novamente.';
+        }
+      });
       this.form.reset();
-      this.router.navigate(['/register-success']);
+    } else {
+      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
     }
   }
+  
 
   ngOnInit() {
    
     this.form = this.fb.group(
       {
-        name: new FormControl('', [
+        fullname: new FormControl('', [
           Validators.required,
           Validators.minLength(3),
           Validators.maxLength(100),
@@ -102,7 +117,7 @@ export class RegisterComponent {
           Validators.minLength(2),
           Validators.maxLength(2),
         ]),
-        phone: new FormControl('', [
+        phoneNumber: new FormControl('', [
           Validators.required,
           Validators.minLength(9),
           Validators.maxLength(9),

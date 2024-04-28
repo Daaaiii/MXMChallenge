@@ -10,39 +10,39 @@
         <div class="row">
           <div class="offset-md-2 col-md-8">
             <div class="form-group mb-3">
-              <label for="name" class="form-label">Nome completo</label>
+              <label for="fullname" class="form-label">Nome completo</label>
               <input
                 type="text"
                 class="form-control"
-                formControlName="name"
-                id="name"
+                formControlName="fullname"
+                id="fullname"
                 placeholder="Digite seu nome"
                 [class.is-invalid]="
-                  form.get('name')?.invalid &&
-                  (form.get('name')?.dirty || form.get('name')?.touched)
+                  form.get('fullname')?.invalid &&
+                  (form.get('fullname')?.dirty || form.get('fullname')?.touched)
                 "
                 required
               />
               <div
                 *ngIf="
-                  form.get('name')?.invalid &&
-                  (form.get('name')?.dirty || form.get('name')?.touched)
+                  form.get('fullname')?.invalid &&
+                  (form.get('fullname')?.dirty || form.get('fullname')?.touched)
                 "
                 class="invalid-feedback"
               >
-                <div *ngIf="form.get('name')?.errors?.['nameInvalid']">
+                <div *ngIf="form.get('fullname')?.errors?.['nameInvalid']">
                   <div
-                    *ngIf="form.get('name')?.errors?.['reason'] === 'Not enough words'"
+                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Not enough words'"
                   >
                     Por favor, informe seu nome e sobrenome.
                   </div>
                   <div
-                    *ngIf="form.get('name')?.errors?.['reason'] === 'Word too short'"
+                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Word too short'"
                   >
                     Cada nome/sobrenome deve ter pelo menos 3 letras.
                   </div>
                   <div
-                    *ngIf="form.get('name')?.errors?.['reason'] === 'Invalid characters'"
+                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Invalid characters'"
                   >
                     O nome não pode conter símbolos e números.
                   </div>
@@ -53,12 +53,12 @@
         </div>
         <div class="row align-items-center">
           <div class="offset-md-2 col-md-2 mb-3">
-            <label for="DDD" class="form-label">DDD</label>
+            <label for="ddd" class="form-label">DDD</label>
             <select
               class="form-select"
               size="1"
               formControlName="ddd"
-              id="DDD"
+              id="ddd"
               [class.is-invalid]="
                 form.get('ddd')?.invalid &&
                 (form.get('ddd')?.dirty || form.get('ddd')?.touched)
@@ -80,28 +80,28 @@
           </div>
   
           <div class="col-md-6 mb-3">
-            <label for="phone" class="form-label">Telefone</label>
+            <label for="phoneNumber" class="form-label">Telefone</label>
             <input
               type="tel"
               class="form-control"
-              id="phone"
+              id="phoneNumber"
               mask="0 0000-0000"
-              formControlName="phone"
+              formControlName="phoneNumber"
               placeholder="Digite seu telefone"
               [class.is-invalid]="
-                form.get('phone')?.invalid &&
-                (form.get('phone')?.dirty || form.get('phone')?.touched)
+                form.get('phoneNumber')?.invalid &&
+                (form.get('phoneNumber')?.dirty || form.get('phoneNumber')?.touched)
               "
               required
             />
             <div
               *ngIf="
-                form.get('phone')?.invalid &&
-                (form.get('phone')?.dirty || form.get('phone')?.touched)
+                form.get('phoneNumber')?.invalid &&
+                (form.get('phoneNumber')?.dirty || form.get('phoneNumber')?.touched)
               "
               class="invalid-feedback"
             >
-              <div *ngIf="form.get('phone')?.errors?.['phoneInvalid']">
+              <div *ngIf="form.get('phoneNumber')?.errors?.['phoneInvalid']">
                 Número de telefone inválido.
               </div>
             </div>
