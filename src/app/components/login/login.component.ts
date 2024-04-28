@@ -6,7 +6,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -18,8 +19,9 @@ import { RouterLink } from '@angular/router';
 export class LoginComponent implements OnInit {
   form!: FormGroup;
   public showPassword: boolean = false;
+  errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -30,13 +32,19 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     if (this.form.valid) {
-      alert(
-        'Email: ' +
-          this.form.value.email +
-          '\nPassword: ' +
-          this.form.value.password
-      );
+      this.authService.authenticate(this.form.value).subscribe({
+        next: (response) => {
+          this.router.navigate(['/profile']);
+        },
+        error: (err) => {
+          console.error('Authentication error:', err);
+          this.errorMessage = 'Falha na autenticação. Por favor, verifique seus dados e tente novamente.';
+        }
+      });
       this.form.reset();
+    } else {
+      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
     }
+     
   }
 }
