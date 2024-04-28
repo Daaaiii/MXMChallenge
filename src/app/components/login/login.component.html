@@ -1,6 +1,10 @@
 <div class="container-fluid">
     <div class="row align-items-center mt-5">
       <h1>Login</h1>
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+    </div>
+
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
         <div class="form-group offset-md-2 col-md-8 mb-3">
           <label for="email">Email</label>
@@ -51,6 +55,7 @@
           Ainda não está cadastrado? <a routerLink="/register">Clique Aqui.</a>
         </p>
         <button type="submit" class="btn btn-primary mt-2" [disabled]="form.invalid">Login</button>
+        
       </form>
     </div>
   </div>
