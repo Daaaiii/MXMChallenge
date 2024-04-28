@@ -28,13 +28,17 @@ export class AuthService {
     return null;
   }
   authenticate(data: any): Observable<TokenInfoDTO> {
-    console.log('data', data);
-    return this.http.post<TokenInfoDTO>(`${this.apiUrl}/auth`, data).pipe(
+   try {
+     return this.http.post<TokenInfoDTO>(`${this.apiUrl}/auth`, data).pipe(
       tap((response) => {
         localStorage.setItem('AuthToken', response.token);
         localStorage.setItem('User', response.fullname);
       })
     );
+   } catch (error) {
+      return throwError('Error');
+    
+   }
   }
 
   logout() {
