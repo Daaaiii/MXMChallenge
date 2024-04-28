@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       this.authService.authenticate(this.form.value).subscribe({
         next: () => {
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/welcome']);
         },
         error: (err) => {
           console.error('Authentication error:', err);
