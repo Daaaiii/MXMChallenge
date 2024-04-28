@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component,  Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -12,6 +12,8 @@ export class NavbarComponent {
   
   @Input() page: string = '';
   @Input() route: string = '';
+
+
 
   
   
