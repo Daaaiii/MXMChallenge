@@ -1,56 +1,58 @@
 # MXMChallenge
 
-Este projeto foi desenvolvido usando [Angular CLI](https://github.com/angular/angular-cli) version 17.3.3.
-Além disso, também foram utilizados a biblioteca ngx-mask para estilizar campos de input, ReactiveForms para aprimorar o uso dos formulários do Angular, e o Bootstrap para permitir um layout mais padronizado.
-Quanto a segurança, o aplicativo utiliza um Guard para verificar se o usuário está autenticado e dessa forma permite que o usuário acesse suas informações que foram cadastradas.
-Também utilizei um interceptor para adicionar o token aos headers das requisições e dessa forma simplificar as consultas ao backend.
-Outro ponto importante são as validações aos campos de input:
-- verificação do tamanho do nome do usuário, para evitar que o usuário digite apenas 1 caracter;
-- verificação do cep;
-- verificação do cpf ou cnpj;
-- validação da senha para ter pelo menos uma letra maiuscula, uma letra minúscula, um símbolo e um número.
-- validação de confirmação da senha para confirmar que a senha digitada corresponde a senha confirmada.
-- validação de número de telefone.
+Aplicação Angular 17 para cadastro, autenticação, consulta de CEP via ViaCEP e gerenciamento de perfil.
 
-Para as requisições ao backend, criei um service que é conectado a api para que o usuário possa criar, atualizar, listar ou deletar sua conta.
-Também utilizei um service para que o usuário faça uma busca direta ao ViaCep para buscar os dados do seu endereço e facilitar o preenchimentos dos campos.
+O projeto usa Angular standalone com SSR, Reactive Forms, `ngx-mask`, Bootstrap Icons, guard de autenticação e interceptor HTTP para enviar o token nas requisições protegidas.
 
+## Funcionalidades
 
-![alt text](exemplo.gif)
+- Login com armazenamento de token no navegador.
+- Cadastro com validações de nome, CEP, CPF/CNPJ, senha, confirmação de senha e telefone.
+- Busca automática de endereço pelo ViaCEP.
+- Perfil protegido por guard de autenticação.
+- Exclusão de perfil com confirmação.
 
+## Requisitos
 
-## Getting Started
+- Node.js `^20.19.0` ou `>=22.12.0` para compatibilidade com Vite 8.
+- npm, yarn, pnpm ou bun.
 
-1 - Clone the project:
+## Como rodar
 
-```bash
-git clone https://github.com/Daaaiii/MXMChallenge.git
-```
-
-
-2 - Install the dependencies:
+1. Instale as dependências:
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
 ```
 
-3 - Run the development server:
+2. Inicie o servidor de desenvolvimento:
 
 ```bash
-ng serve
-
+npm start
 ```
-## Rodando o servidor localmente
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+3. Acesse:
 
-## Stay in touch
+```text
+http://localhost:4200/
+```
+
+## Scripts
+
+```bash
+npm run build
+npm test
+```
+
+## API
+
+A URL da API fica configurada em `src/environments/environment.ts` e `src/environments/environment.prod.ts`.
+
+## Demonstração
+
+![Demonstração do MXMChallenge](exemplo.gif)
+
+## Contato
 
 <table>
   <tr>

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WelcomeComponent } from './welcome.component';
+import { AuthService } from '../../services/auth.service';
+import { provideRouter } from '@angular/router';
 
 describe('WelcomeComponent', () => {
   let component: WelcomeComponent;
@@ -8,7 +10,11 @@ describe('WelcomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WelcomeComponent]
+      imports: [WelcomeComponent],
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: jasmine.createSpyObj<AuthService>('AuthService', ['getStoredUserName', 'logout']) },
+      ],
     })
     .compileComponents();
     

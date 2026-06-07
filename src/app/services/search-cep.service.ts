@@ -13,6 +13,7 @@ export interface CepData {
   gia: string;
   ddd: string;
   siafi: string;
+  erro?: boolean;
 }
 
 @Injectable({
@@ -22,7 +23,7 @@ export class SearchCepService {
 
   constructor(private http: HttpClient) { }
 
-  buscarCEP(cep: string): Observable<any> {
+  buscarCEP(cep: string): Observable<CepData> {
     return this.http.get<CepData>(`https://viacep.com.br/ws/${cep}/json/`);
   }
 }

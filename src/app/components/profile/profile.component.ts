@@ -20,7 +20,7 @@ export class ProfileComponent {
   
   constructor(private authService: AuthService, private router:Router) {}
 
-  username:string = localStorage.getItem('User') || '';
+  username:string = this.authService.getStoredUserName();
   user: RegisterDTO = {} as RegisterDTO;
 
   ngOnInit() {
@@ -44,9 +44,5 @@ export class ProfileComponent {
   deleteProfile() {
     this.router.navigate(['/delete']);
     
-  }
-
-  updateProfile() {
-    this.router.navigate(['/update']);
   }
 }

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { LoginComponent } from '../login/login.component';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { Router } from 'express';
 import { RouterLink } from '@angular/router';
 
 @Component({

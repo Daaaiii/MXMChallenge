@@ -190,14 +190,19 @@
                 "
                 required
               />
-              <span class="input-group-text">
+              <button
+                type="button"
+                class="input-group-text btn btn-outline-secondary"
+                aria-label="Alternar visibilidade da senha"
+                [attr.aria-pressed]="showPassword"
+                (click)="showPassword = !showPassword"
+              >
                 <i
                   class="bi"
                   [class.bi-eye-fill]="!showPassword"
                   [class.bi-eye-slash-fill]="showPassword"
-                  (click)="showPassword = !showPassword"
                 ></i>
-              </span>
+              </button>
               <div
                 *ngIf="
                   form.get('password')?.invalid &&
@@ -246,14 +251,19 @@
                 [class.is-invalid]="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
                 required
               />
-              <span class="input-group-text">
+              <button
+                type="button"
+                class="input-group-text btn btn-outline-secondary"
+                aria-label="Alternar visibilidade da confirmação de senha"
+                [attr.aria-pressed]="showPasswordConfirmation"
+                (click)="showPasswordConfirmation = !showPasswordConfirmation"
+              >
                 <i
                   class="bi"
                   [class.bi-eye-fill]="!showPasswordConfirmation"
                   [class.bi-eye-slash-fill]="showPasswordConfirmation"
-                  (click)="showPasswordConfirmation = !showPasswordConfirmation"
                 ></i>
-              </span>
+              </button>
               <div
                 *ngIf="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
                 class="invalid-feedback"

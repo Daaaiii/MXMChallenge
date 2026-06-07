@@ -1,30 +1,38 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-deleteprofile',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './deleteprofile.component.html',
   styleUrl: './deleteprofile.component.css',
 })
 export class DeleteprofileComponent {
+  feedbackMessage = '';
+  isDeleting = false;
+
   constructor(private router: Router, private authService: AuthService) {}
 
   confirmarExclusao() {
     if (this.authService.isLoggedIn()) {
+      this.isDeleting = true;
       this.authService.deleteProfile().subscribe({
         next: () => {
-          alert('Profile deleted');
+          this.feedbackMessage = 'Perfil excluído com sucesso.';
+          this.authService.logout();
+          this.router.navigate(['/home']);
         },
-        error: (err) => console.error('Deletion failed', err),
+        error: () => {
+          this.feedbackMessage = 'Não foi possível excluir o perfil. Tente novamente.';
+          this.isDeleting = false;
+        },
       });
     } else {
-      console.error('Authentication token missing');
+      this.feedbackMessage = 'Token de autenticação ausente.';
     }
-    this.authService.logout();
-    this.router.navigate(['/home']);
   }
 
   cancelarExclusao() {

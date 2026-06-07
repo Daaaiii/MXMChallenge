@@ -5,17 +5,19 @@ export function nameValidator(): ValidatorFn {
     const value = (control.value || '').trim();
     const words = value.split(' ').filter(Boolean);
 
-    const validCharsRegex = /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ ]+$/;
+    const validCharsRegex = /^[\p{L}\s]+$/u;
 
     if (words.length < 2) {
-      return { 'nameInvalid': true, 'reason': 'Not enough words' };
+      return { nameInvalid: true, reason: 'Not enough words' };
     }
-    for (let word of words) {
+
+    for (const word of words) {
       if (word.length < 2) {
-        return { 'nameInvalid': true, 'reason': 'Word too short' };
+        return { nameInvalid: true, reason: 'Word too short' };
       }
+
       if (!validCharsRegex.test(word)) {
-        return { 'nameInvalid': true, 'reason': 'Invalid characters' };
+        return { nameInvalid: true, reason: 'Invalid characters' };
       }
     }
 

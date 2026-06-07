@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { passwordComplexityValidator } from '../../utils/validators/checkPassword';
 import { cpfCnpjValidator } from '../../utils/validators/checkCPF_CNPJ';
 import { cepValidator } from '../../utils/validators/checkCEP';
@@ -14,6 +14,7 @@ import { FormService } from '../../services/form.service';
 import { SearchCepService } from '../../services/search-cep.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
+import { RegisterFormDataDTO } from '../../models/authDTO';
 
 
 @Component({
@@ -25,6 +26,8 @@ import { AuthService } from '../../services/auth.service';
   providers:[provideNgxMask()]
 })
 export class RegisterComponent {
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private fb: FormBuilder,
     private formService: FormService,
@@ -38,7 +41,6 @@ export class RegisterComponent {
   route= '/home';
   form!: FormGroup;
   errorMessage: string | null = '';
-  formSubscription: Subscription | undefined;
   public showPassword: boolean = false;
   public showPasswordConfirmation: boolean = false;
   searchAttempted: boolean = false;
@@ -160,14 +162,18 @@ export class RegisterComponent {
       { validators: [confirmPasswordValidator()] }
     );
 
-    this.formSubscription = this.form.valueChanges.subscribe((values) => {
-      this.formService.setFormData(values);
-    });
-    this.formService.getFormData().subscribe((data) => {
-      if (data) {
-        this.form.patchValue(data);
-      }
-    });
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((values: Partial<RegisterFormDataDTO>) => {
+        this.formService.setFormData(values);
+      });
+    this.formService.getFormData()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        if (data) {
+          this.form.patchValue(data);
+        }
+      });
   }
   
 

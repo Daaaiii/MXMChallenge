@@ -33,13 +33,19 @@
                 formControlName="password"
                 required
               />
-              <span class="input-group-text" (click)="showPassword = !showPassword">
+              <button
+                type="button"
+                class="input-group-text btn btn-outline-secondary"
+                aria-label="Alternar visibilidade da senha"
+                [attr.aria-pressed]="showPassword"
+                (click)="showPassword = !showPassword"
+              >
                 <i
                   class="bi"
                   [class.bi-eye-fill]="!showPassword"
                   [class.bi-eye-slash-fill]="showPassword"
                 ></i>
-              </span>
+              </button>
             </div>
             <div
               *ngIf="

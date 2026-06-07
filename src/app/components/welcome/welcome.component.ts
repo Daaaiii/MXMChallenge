@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SidebarComponent } from "../sidebar/sidebar.component";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-welcome',
@@ -9,5 +10,7 @@ import { SidebarComponent } from "../sidebar/sidebar.component";
     imports: [SidebarComponent]
 })
 export class WelcomeComponent {
-  username:string = localStorage.getItem('User') || '';
+  constructor(private authService: AuthService) {}
+
+  username:string = this.authService.getStoredUserName();
 }
