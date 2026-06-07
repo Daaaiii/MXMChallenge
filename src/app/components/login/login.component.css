@@ -26,6 +26,22 @@
   gap: 4px;
 }
 
+.login-form .form-control {
+  background: var(--warm-sand);
+  border-color: var(--celadon);
+}
+
+.login-form .form-control:focus {
+  background: var(--warm-sand);
+  border-color: var(--cerulean);
+}
+
+.login-form .input-group-text {
+  background: var(--celadon);
+  border-color: var(--celadon);
+  color: var(--space-indigo);
+}
+
 .login-footer {
   color: var(--app-muted);
   margin: 18px 0 0;
