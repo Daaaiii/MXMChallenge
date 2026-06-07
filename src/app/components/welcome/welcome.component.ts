@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { SidebarComponent } from "../sidebar/sidebar.component";
 import { AuthService } from '../../services/auth.service';
 
@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
     selector: 'app-welcome',
     templateUrl: './welcome.component.html',
     styleUrl: './welcome.component.css',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [SidebarComponent]
 })
 export class WelcomeComponent {

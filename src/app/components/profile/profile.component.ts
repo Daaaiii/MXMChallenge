@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RegisterDTO } from '../../models/registerDTO';
@@ -10,6 +10,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     selector: 'app-profile',
     imports: [SidebarComponent],
     templateUrl: './profile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './profile.component.css'
 })
 export class ProfileComponent {

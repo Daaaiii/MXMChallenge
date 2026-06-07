@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
     selector: 'app-deleteprofile',
     imports: [],
     templateUrl: './deleteprofile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './deleteprofile.component.css'
 })
 export class DeleteprofileComponent {

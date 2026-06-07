@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { LoginComponent } from '../login/login.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 
@@ -6,6 +6,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
     selector: 'app-home',
     imports: [LoginComponent, NavbarComponent],
     templateUrl: './home.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './home.component.css'
 })
 export class HomeComponent {

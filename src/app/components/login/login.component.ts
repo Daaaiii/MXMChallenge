@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
     selector: 'app-login',
     imports: [ReactiveFormsModule, RouterLink],
     templateUrl: './login.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {

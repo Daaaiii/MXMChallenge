@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { BrowserStorageService } from './browser-storage.service';
 import { environment } from '../../environments/environment';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -27,7 +27,7 @@ describe('AuthService', () => {
         AuthService,
         { provide: BrowserStorageService, useValue: storage },
         { provide: Router, useValue: router },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
     ]
 });

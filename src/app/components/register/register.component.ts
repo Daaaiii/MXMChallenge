@@ -1,8 +1,7 @@
 
-import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { passwordComplexityValidator } from '../../utils/validators/checkPassword';
 import { cpfCnpjValidator } from '../../utils/validators/checkCPF_CNPJ';
@@ -19,10 +18,10 @@ import { RegisterFormDataDTO } from '../../models/authDTO';
 
 @Component({
     selector: 'app-register',
-    imports: [ReactiveFormsModule, NgxMaskDirective, NavbarComponent, RouterLink],
+    imports: [ReactiveFormsModule, NavbarComponent, RouterLink],
     templateUrl: './register.component.html',
     styleUrl: './register.component.css',
-    providers: [provideNgxMask()]
+    changeDetection: ChangeDetectionStrategy.Eager
 })
 export class RegisterComponent {
   private destroyRef = inject(DestroyRef);
