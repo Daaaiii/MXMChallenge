@@ -1,15 +1,22 @@
 :root {
-  --app-bg: #f4f7fb;
-  --app-surface: #ffffff;
-  --app-surface-soft: #eef4f8;
-  --app-primary: #0f5d75;
-  --app-primary-dark: #0a4152;
-  --app-accent: #7a5c1f;
-  --app-danger: #b42318;
-  --app-text: #1d2733;
-  --app-muted: #617080;
-  --app-border: #d9e2ea;
-  --app-shadow: 0 18px 48px rgba(16, 36, 50, 0.12);
+  --space-indigo: #222e50;
+  --cerulean: #007991;
+  --seagrass: #439a86;
+  --celadon: #bcd8c1;
+  --light-gold: #e9d985;
+  --warm-sand: #f3eddb;
+  --app-bg: var(--warm-sand);
+  --app-surface: #fbf8ee;
+  --app-surface-soft: var(--celadon);
+  --app-primary: var(--cerulean);
+  --app-primary-dark: var(--space-indigo);
+  --app-accent: var(--light-gold);
+  --app-danger: var(--seagrass);
+  --app-text: var(--space-indigo);
+  --app-muted: var(--seagrass);
+  --app-border: var(--celadon);
+  --app-on-primary: var(--celadon);
+  --app-shadow: 0 18px 48px rgba(34, 46, 80, 0.16);
   --app-radius: 8px;
 }
 
@@ -66,7 +73,7 @@ a:hover {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--app-primary);
-  box-shadow: 0 0 0 0.18rem rgba(15, 93, 117, 0.14);
+  box-shadow: 0 0 0 0.18rem rgba(0, 121, 145, 0.22);
 }
 
 .app-shell {

@@ -52,7 +52,7 @@
   align-items: center;
   background: var(--app-primary);
   border-radius: 50%;
-  color: #ffffff;
+  color: var(--app-on-primary);
   display: inline-flex;
   flex: 0 0 32px;
   font-weight: 800;

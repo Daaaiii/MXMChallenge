@@ -1,6 +1,6 @@
 .public-header {
   align-items: center;
-  background: #ffffff;
+  background: var(--app-surface);
   border-bottom: 1px solid var(--app-border);
   display: flex;
   justify-content: space-between;
@@ -25,7 +25,7 @@
   align-items: center;
   background: var(--app-primary);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--app-on-primary);
   display: inline-flex;
   font-size: 13px;
   height: 34px;
@@ -41,7 +41,7 @@
 
 .btn-outline-primary:hover {
   background: var(--app-primary);
-  color: #ffffff;
+  color: var(--app-on-primary);
 }
 
 @media (max-width: 640px) {

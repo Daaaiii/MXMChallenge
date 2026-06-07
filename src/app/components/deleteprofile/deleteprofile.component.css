@@ -11,7 +11,7 @@
 
 .warning-icon {
   align-items: center;
-  background: #fff1f0;
+  background: rgba(67, 154, 134, 0.16);
   border-radius: 50%;
   color: var(--app-danger);
   display: flex;
