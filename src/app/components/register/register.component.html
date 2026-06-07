@@ -1,53 +1,59 @@
 <app-navbar [page]="page" [route]="route"></app-navbar>
 <div class="container mt-5 mb-5">
-    <section class="row">
-      <form
-        [formGroup]="form"
-        (ngSubmit)="onSubmit()"
-        class="needs-validation"
-        novalidate
+  <section class="row">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="needs-validation"
+      novalidate
       >
-        <div class="row">
-          <div class="offset-md-2 col-md-8">
-            <div class="form-group mb-3">
-              <label for="fullname" class="form-label">Nome completo</label>
-              <input
-                type="text"
-                class="form-control"
-                formControlName="fullname"
-                id="fullname"
-                placeholder="Digite seu nome"
+      <div class="row">
+        <div class="offset-md-2 col-md-8">
+          <div class="form-group mb-3">
+            <label for="fullname" class="form-label">Nome completo</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="fullname"
+              id="fullname"
+              placeholder="Digite seu nome"
                 [class.is-invalid]="
                   form.get('fullname')?.invalid &&
                   (form.get('fullname')?.dirty || form.get('fullname')?.touched)
                 "
-                required
+              [required]="true"
               />
-              <div
-                *ngIf="
-                  form.get('fullname')?.invalid &&
-                  (form.get('fullname')?.dirty || form.get('fullname')?.touched)
-                "
-                class="invalid-feedback"
-              >
-                <div *ngIf="form.get('fullname')?.errors?.['nameInvalid']">
-                  <div
-                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Not enough words'"
+              @if (
+                form.get('fullname')?.invalid &&
+                (form.get('fullname')?.dirty || form.get('fullname')?.touched)
+                ) {
+                <div
+                  class="invalid-feedback"
                   >
-                    Por favor, informe seu nome e sobrenome.
-                  </div>
-                  <div
-                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Word too short'"
-                  >
-                    Cada nome/sobrenome deve ter pelo menos 3 letras.
-                  </div>
-                  <div
-                    *ngIf="form.get('fullname')?.errors?.['reason'] === 'Invalid characters'"
-                  >
-                    O nome não pode conter símbolos e números.
-                  </div>
+                  @if (form.get('fullname')?.errors?.['nameInvalid']) {
+                    <div>
+                      @if (form.get('fullname')?.errors?.['reason'] === 'Not enough words') {
+                        <div
+                          >
+                          Por favor, informe seu nome e sobrenome.
+                        </div>
+                      }
+                      @if (form.get('fullname')?.errors?.['reason'] === 'Word too short') {
+                        <div
+                          >
+                          Cada nome/sobrenome deve ter pelo menos 3 letras.
+                        </div>
+                      }
+                      @if (form.get('fullname')?.errors?.['reason'] === 'Invalid characters') {
+                        <div
+                          >
+                          O nome não pode conter símbolos e números.
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -64,21 +70,24 @@
                 (form.get('ddd')?.dirty || form.get('ddd')?.touched)
               "
               required
-            >
+              >
               <option value="" selected>Selecione</option>
-              <option *ngFor="let ddd of ddds" [value]="ddd">{{ ddd }}</option>
+              @for (ddd of ddds; track ddd) {
+                <option [value]="ddd">{{ ddd }}</option>
+              }
             </select>
-            <div
-              *ngIf="
-                form.get('ddd')?.invalid &&
-                (form.get('ddd')?.dirty || form.get('ddd')?.touched)
-              "
-              class="invalid-feedback"
-            >
-              Por favor, selecione um DDD.
-            </div>
+            @if (
+              form.get('ddd')?.invalid &&
+              (form.get('ddd')?.dirty || form.get('ddd')?.touched)
+              ) {
+              <div
+                class="invalid-feedback"
+                >
+                Por favor, selecione um DDD.
+              </div>
+            }
           </div>
-  
+
           <div class="col-md-6 mb-3">
             <label for="phoneNumber" class="form-label">Telefone</label>
             <input
@@ -92,383 +101,436 @@
                 form.get('phoneNumber')?.invalid &&
                 (form.get('phoneNumber')?.dirty || form.get('phoneNumber')?.touched)
               "
-              required
-            />
-            <div
-              *ngIf="
+              [required]="true"
+              />
+              @if (
                 form.get('phoneNumber')?.invalid &&
                 (form.get('phoneNumber')?.dirty || form.get('phoneNumber')?.touched)
-              "
-              class="invalid-feedback"
-            >
-              <div *ngIf="form.get('phoneNumber')?.errors?.['phoneInvalid']">
-                Número de telefone inválido.
-              </div>
+                ) {
+                <div
+                  class="invalid-feedback"
+                  >
+                  @if (form.get('phoneNumber')?.errors?.['phoneInvalid']) {
+                    <div>
+                      Número de telefone inválido.
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="offset-md-2 col-md-8 mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input
-              type="email"
-              id="email"
-              formControlName="email"
-              class="form-control"
-              placeholder="Digite seu email"
-              [class.is-invalid]="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['userEmailExists']"
-              required
-            />
-            <span *ngIf="form.errors?.['userEmailExists']" class="text-danger"
-              >Email já cadastrado.</span
-            >
-            <div
-              *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['emailExists']"
-              class="invalid-feedback"
-            >
-              <div *ngIf="form.get('email')?.errors?.['required']">
-                Informe seu email.
-              </div>
-              <div *ngIf="form.get('email')?.errors?.['email']">
-                Informe um endereço de email válido.
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="offset-md-2 col-md-8 mb-3">
-            <label for="CPF_CNPJ" class="form-label">CPF ou CNPJ</label>
-            <input
-              type="text"
-              class="form-control"
-              id="cpf_cnpj"
-              inputmode="numeric"
-              mask="CPF_CNPJ"
-              formControlName="cpf_cnpj"
-              aria-describedby="cpf_cnpj"
-              placeholder="Informe seu CPF ou CNPJ"
-              [class.is-invalid]="form.get('cpf_cnpj')?.invalid && (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched) ||form.errors?.['userCPFExists']"
-              required
-            />
-            <span *ngIf="form.errors?.['userCPFExists']" class="text-danger"
-              >CPF já cadastrado.</span
-            >
-  
-            <div
-              *ngIf="
-                form.get('cpf_cnpj')?.invalid &&
-                (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched)
-              "
-              class="invalid-feedback"
-            >
-              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCpf'] "
-                >CPF inválido</span
-              >
-              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCpfCnpj']"
-                >O valor deve ser um CPF ou CNPJ válido.</span
-              >
-              <span *ngIf="form.get('cpf_cnpj')?.errors?.['invalidCnpj']"
-                >CNPJ inválido.</span
-              >
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="offset-md-2 col-md-8 mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <div class="input-group">
+          <div class="row">
+            <div class="offset-md-2 col-md-8 mb-3">
+              <label for="email" class="form-label">Email</label>
               <input
-                [type]="showPassword ? 'text' : 'password'"
+                type="email"
+                id="email"
+                formControlName="email"
                 class="form-control"
-                formControlName="password"
-                id="password"
-                placeholder="Digite sua senha"
+                placeholder="Digite seu email"
+                [class.is-invalid]="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['userEmailExists']"
+                required
+                />
+                @if (form.errors?.['userEmailExists']) {
+                  <span class="text-danger"
+                    >Email já cadastrado.</span
+                    >
+                }
+                @if (form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched) ||form.errors?.['emailExists']) {
+                  <div
+                    class="invalid-feedback"
+                    >
+                    @if (form.get('email')?.errors?.['required']) {
+                      <div>
+                        Informe seu email.
+                      </div>
+                    }
+                    @if (form.get('email')?.errors?.['email']) {
+                      <div>
+                        Informe um endereço de email válido.
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="row">
+              <div class="offset-md-2 col-md-8 mb-3">
+                <label for="CPF_CNPJ" class="form-label">CPF ou CNPJ</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="cpf_cnpj"
+                  inputmode="numeric"
+                  mask="CPF_CNPJ"
+                  formControlName="cpf_cnpj"
+                  aria-describedby="cpf_cnpj"
+                  placeholder="Informe seu CPF ou CNPJ"
+                  [class.is-invalid]="form.get('cpf_cnpj')?.invalid && (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched) ||form.errors?.['userCPFExists']"
+                  [required]="true"
+                  />
+                  @if (form.errors?.['userCPFExists']) {
+                    <span class="text-danger"
+                      >CPF já cadastrado.</span
+                      >
+                  }
+
+                  @if (
+                    form.get('cpf_cnpj')?.invalid &&
+                    (form.get('cpf_cnpj')?.dirty || form.get('cpf_cnpj')?.touched)
+                    ) {
+                    <div
+                      class="invalid-feedback"
+                      >
+                      @if (form.get('cpf_cnpj')?.errors?.['invalidCpf'] ) {
+                        <span
+                          >CPF inválido</span
+                          >
+                        }
+                        @if (form.get('cpf_cnpj')?.errors?.['invalidCpfCnpj']) {
+                          <span
+                            >O valor deve ser um CPF ou CNPJ válido.</span
+                            >
+                          }
+                          @if (form.get('cpf_cnpj')?.errors?.['invalidCnpj']) {
+                            <span
+                              >CNPJ inválido.</span
+                              >
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="offset-md-2 col-md-8 mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <div class="input-group">
+                          <input
+                            [type]="showPassword ? 'text' : 'password'"
+                            class="form-control"
+                            formControlName="password"
+                            id="password"
+                            placeholder="Digite sua senha"
                 [class.is-invalid]="
                   form.get('password')?.invalid &&
                     (form.get('password')?.dirty ||
                   form.get('password')?.touched)
                 "
-                required
-              />
-              <button
-                type="button"
-                class="input-group-text btn btn-outline-secondary"
-                aria-label="Alternar visibilidade da senha"
-                [attr.aria-pressed]="showPassword"
-                (click)="showPassword = !showPassword"
-              >
-                <i
-                  class="bi"
-                  [class.bi-eye-fill]="!showPassword"
-                  [class.bi-eye-slash-fill]="showPassword"
-                ></i>
-              </button>
-              <div
-                *ngIf="
-                  form.get('password')?.invalid &&
-                  (form.get('password')?.dirty || form.get('password')?.touched)
-                "
-                class="invalid-feedback"
-              >
-                <div *ngIf="form.get('password')?.errors?.['required']">
-                  Informe sua senha.
-                </div>
-                <div *ngIf="form.get('password')?.errors?.['maxLength']"
-                > {{ form.get('password')?.errors?.['maxLength'] }}</div>  
-                <div *ngIf="form.get('password')?.errors?.['uppercaseRequired']">
-                  {{ form.get('password')?.errors?.['uppercaseRequired'] }}
-                </div>
-                <div *ngIf="form.get('password')?.errors?.['lowercaseRequired']">
-                  {{ form.get('password')?.errors?.['lowercaseRequired'] }}
-                </div>
-                <div *ngIf="form.get('password')?.errors?.['numericRequired']">
-                  {{ form.get('password')?.errors?.['numericRequired'] }}
-                </div>
-                <div
-                  *ngIf="form.get('password')?.errors?.['specialCharRequired']"
-                >
-                  {{ form.get('password')?.errors?.['specialCharRequired'] }}
-                </div>
-                <div *ngIf="form.get('password')?.errors?.['minLengthRequired']">
-                  {{ form.get('password')?.errors?.['minLengthRequired'] }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="offset-md-2 col-md-8 mb-3">
-            <label for="confirm-password" class="form-label"
-              >Confirme sua senha</label
-            >
-            <div class="input-group">
-              <input
-                [type]="showPasswordConfirmation ? 'text' : 'password'"
-                class="form-control"
-                formControlName="confirmPassword"
-                id="confirmPassword"
-                placeholder="Confirme sua senha"
-                [class.is-invalid]="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
-                required
-              />
-              <button
-                type="button"
-                class="input-group-text btn btn-outline-secondary"
-                aria-label="Alternar visibilidade da confirmação de senha"
-                [attr.aria-pressed]="showPasswordConfirmation"
-                (click)="showPasswordConfirmation = !showPasswordConfirmation"
-              >
-                <i
-                  class="bi"
-                  [class.bi-eye-fill]="!showPasswordConfirmation"
-                  [class.bi-eye-slash-fill]="showPasswordConfirmation"
-                ></i>
-              </button>
-              <div
-                *ngIf="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
-                class="invalid-feedback"
-              >
-                A senha informada deve ser igual a senha anterior.
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="row">
-          <div class="offset-md-2 col-md-4 mb-3">
-            <label for="zipcode" class="form-label">CEP</label>
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                formControlName="zipcode"
-                id="zipcode"
-                mask="00000-000"
-                placeholder="Digite o seu CEP"
+                            required
+                            />
+                            <button
+                              type="button"
+                              class="input-group-text btn btn-outline-secondary"
+                              aria-label="Alternar visibilidade da senha"
+                              [attr.aria-pressed]="showPassword"
+                              (click)="showPassword = !showPassword"
+                              >
+                            <i
+                              class="bi"
+                              [class.bi-eye-fill]="!showPassword"
+                              [class.bi-eye-slash-fill]="showPassword"
+                            ></i>
+                          </button>
+                          @if (
+                            form.get('password')?.invalid &&
+                            (form.get('password')?.dirty || form.get('password')?.touched)
+                            ) {
+                            <div
+                              class="invalid-feedback"
+                              >
+                              @if (form.get('password')?.errors?.['required']) {
+                                <div>
+                                  Informe sua senha.
+                                </div>
+                              }
+                              @if (form.get('password')?.errors?.['maxLength']) {
+                                <div
+                                > {{ form.get('password')?.errors?.['maxLength'] }}</div>
+                              }
+                              @if (form.get('password')?.errors?.['uppercaseRequired']) {
+                                <div>
+                                  {{ form.get('password')?.errors?.['uppercaseRequired'] }}
+                                </div>
+                              }
+                              @if (form.get('password')?.errors?.['lowercaseRequired']) {
+                                <div>
+                                  {{ form.get('password')?.errors?.['lowercaseRequired'] }}
+                                </div>
+                              }
+                              @if (form.get('password')?.errors?.['numericRequired']) {
+                                <div>
+                                  {{ form.get('password')?.errors?.['numericRequired'] }}
+                                </div>
+                              }
+                              @if (form.get('password')?.errors?.['specialCharRequired']) {
+                                <div
+                                  >
+                                  {{ form.get('password')?.errors?.['specialCharRequired'] }}
+                                </div>
+                              }
+                              @if (form.get('password')?.errors?.['minLengthRequired']) {
+                                <div>
+                                  {{ form.get('password')?.errors?.['minLengthRequired'] }}
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="offset-md-2 col-md-8 mb-3">
+                        <label for="confirm-password" class="form-label"
+                          >Confirme sua senha</label
+                          >
+                          <div class="input-group">
+                            <input
+                              [type]="showPasswordConfirmation ? 'text' : 'password'"
+                              class="form-control"
+                              formControlName="confirmPassword"
+                              id="confirmPassword"
+                              placeholder="Confirme sua senha"
+                              [class.is-invalid]="form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)"
+                              [required]="true"
+                              />
+                              <button
+                                type="button"
+                                class="input-group-text btn btn-outline-secondary"
+                                aria-label="Alternar visibilidade da confirmação de senha"
+                                [attr.aria-pressed]="showPasswordConfirmation"
+                                (click)="showPasswordConfirmation = !showPasswordConfirmation"
+                                >
+                              <i
+                                class="bi"
+                                [class.bi-eye-fill]="!showPasswordConfirmation"
+                                [class.bi-eye-slash-fill]="showPasswordConfirmation"
+                              ></i>
+                            </button>
+                            @if (form.errors?.['passwordMismatch'] && (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)) {
+                              <div
+                                class="invalid-feedback"
+                                >
+                                A senha informada deve ser igual a senha anterior.
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="offset-md-2 col-md-4 mb-3">
+                          <label for="zipcode" class="form-label">CEP</label>
+                          <div class="input-group">
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="zipcode"
+                              id="zipcode"
+                              mask="00000-000"
+                              placeholder="Digite o seu CEP"
                 [class.is-invalid]="
                   form.get('zipcode')?.invalid &&
                   (form.get('zipcode')?.dirty || form.get('zipcode')?.touched)
                 "
-                required
-              />
-              <button
-                class="btn btn-outline-primary"
-                type="button"
-                (click)="searchCEP()"
-              >
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-            <div
-              *ngIf="
-                form.get('zipcode')?.invalid &&
-                (form.get('zipcode')?.dirty || form.get('zipcode')?.touched)
-              "
-              class="invalid-feedback"
-            >
-              Formato de CEP inválido. O CEP deve conter exatamente 8 dígitos
-              numéricos.
-            </div>
-            <div *ngIf="searchAttempted">
-              <div *ngIf="errorMessage" class="invalid-feedback d-block">
-                {{ errorMessage }}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label for="state" class="form-label">UF</label>
-            <select
-              type="text"
-              class="form-control"
-              formControlName="state"
-              id="state"
-              placeholder="Selecione a sua unidade federativa"
+                              [required]="true"
+                              />
+                              <button
+                                class="btn btn-outline-primary"
+                                type="button"
+                                (click)="searchCEP()"
+                                >
+                                <i class="bi bi-search"></i>
+                              </button>
+                            </div>
+                            @if (
+                              form.get('zipcode')?.invalid &&
+                              (form.get('zipcode')?.dirty || form.get('zipcode')?.touched)
+                              ) {
+                              <div
+                                class="invalid-feedback"
+                                >
+                                Formato de CEP inválido. O CEP deve conter exatamente 8 dígitos
+                                numéricos.
+                              </div>
+                            }
+                            @if (searchAttempted) {
+                              <div>
+                                @if (errorMessage) {
+                                  <div class="invalid-feedback d-block">
+                                    {{ errorMessage }}
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="state" class="form-label">UF</label>
+                            <select
+                              type="text"
+                              class="form-control"
+                              formControlName="state"
+                              id="state"
+                              placeholder="Selecione a sua unidade federativa"
               [class.is-invalid]="
                 form.get('state')?.invalid &&
                 (form.get('state')?.dirty || form.get('state')?.touched)
               "
-              required
-            >
-              <option value="" selected>Selecione</option>
-              <option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</option>
-            </select>
-            <div
-              *ngIf="
-                form.get('state')?.invalid &&
-                (form.get('state')?.dirty || form.get('state')?.touched)
-              "
-              class="invalid-feedback"
-            ></div>
-          </div>
-        </div>
-  
-        <div class="row">
-          <div class="offset-md-2 col-md-6 mb-3">
-            <label for="street" class="form-label">Logradouro | Rua</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="street"
-              id="street"
-              placeholder="Digite o logradouro."
-              [class.is-invalid]="
-                form.get('street')?.invalid &&
-                (form.get('street')?.dirty || form.get('street')?.touched)
-              "
-              required
-            />
-            <div
-              *ngIf="
-                form.get('street')?.invalid &&
-                (form.get('street')?.dirty || form.get('street')?.touched)
-              "
-              class="invalid-feedback"
-            ></div>
-          </div>
-          <div class="col-md-2 mb-3">
-            <label for="number" class="form-label">Número</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="number"
-              id="number"
-              placeholder="Digite o número do endereço."
-              [class.is-invalid]="
-                form.get('number')?.invalid &&
-                (form.get('number')?.dirty || form.get('number')?.touched)
-              "
-              required
-            />
-            <div
-              *ngIf="
-                form.get('number')?.invalid &&
-                (form.get('number')?.dirty || form.get('number')?.touched)
-              "
-              class="invalid-feedback"
-            ></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="offset-md-2 col-md-4 mb-3">
-            <label for="city" class="form-label">Cidade</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="city"
-              id="city"
-              placeholder="Digite o nome da cidade."
-              [class.is-invalid]="
-                form.get('city')?.invalid &&
-                (form.get('city')?.dirty || form.get('city')?.touched)
-              "
-              required
-            />
-            <div
-              *ngIf="
-                form.get('city')?.invalid &&
-                (form.get('city')?.dirty || form.get('city')?.touched)
-              "
-              class="invalid-feedback"
-            ></div>
-          </div>
-  
-          <div class="col-md-4 mb-3">
-            <label for="neighborhood" class="form-label">Bairro</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="neighborhood"
-              id="neighborhood"
-              placeholder="Digite o nome do bairro."
-              [class.is-invalid]="
-                form.get('neighborhood')?.invalid &&
-                (form.get('neighborhood')?.dirty ||
-                  form.get('neighborhood')?.touched)
-              "
-              required
-            />
-            <div
-              *ngIf="
-                form.get('neighborhood')?.invalid &&
-                (form.get('neighborhood')?.dirty ||
-                  form.get('neighborhood')?.touched)
-              "
-              class="invalid-feedback"
-            ></div>
-          </div>
-  
-          <div class="offset-md-2 col-md-8 mb-3">
-            <label for="complement" class="form-label">Complemento</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="complement"
-              id="complement"
-              placeholder="Digite o complemento do endereço."
-            />
-          </div>
-        </div>
-  
-        <div class="row">
-          <div class="offset-md-2 col-md-8 mb-3">
-            
-            <div class="d-grid gap-2">
-              <div *ngIf="errorMessage" class="alert alert-danger">
-                {{ errorMessage }}
-            </div>
-              <button type="submit" class="btn btn-primary mt-3 w-100" [disabled]="form.invalid || isLoading">
-                <span *ngIf="!isLoading">Cadastrar</span>
-                <span *ngIf="isLoading" class="spinner-grow spinner-grow-sm"  aria-hidden="true"></span>
-                <span *ngIf="isLoading" role="status">Loading...</span>
-              </button>
-              <p class="mt-2">
-                Já está cadastrado? <a routerLink="/home">Clique Aqui.</a>
-              </p>
-            </div>
+                              required
+                              >
+                              <option value="" selected>Selecione</option>
+                              @for (uf of ufs; track uf) {
+                                <option [value]="uf">{{ uf }}</option>
+                              }
+                            </select>
+                            @if (
+                              form.get('state')?.invalid &&
+                              (form.get('state')?.dirty || form.get('state')?.touched)
+                              ) {
+                              <div
+                                class="invalid-feedback"
+                              ></div>
+                            }
+                          </div>
+                        </div>
 
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
-  
+                        <div class="row">
+                          <div class="offset-md-2 col-md-6 mb-3">
+                            <label for="street" class="form-label">Logradouro | Rua</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="street"
+                              id="street"
+                              placeholder="Digite o logradouro."
+              [class.is-invalid]="
+                form.get('street')?.invalid &&
+                (form.get('street')?.dirty || form.get('street')?.touched)
+              "
+                              required
+                              />
+                              @if (
+                                form.get('street')?.invalid &&
+                                (form.get('street')?.dirty || form.get('street')?.touched)
+                                ) {
+                                <div
+                                  class="invalid-feedback"
+                                ></div>
+                              }
+                            </div>
+                            <div class="col-md-2 mb-3">
+                              <label for="number" class="form-label">Número</label>
+                              <input
+                                type="text"
+                                class="form-control"
+                                formControlName="number"
+                                id="number"
+                                placeholder="Digite o número do endereço."
+              [class.is-invalid]="
+                form.get('number')?.invalid &&
+                (form.get('number')?.dirty || form.get('number')?.touched)
+              "
+                                required
+                                />
+                                @if (
+                                  form.get('number')?.invalid &&
+                                  (form.get('number')?.dirty || form.get('number')?.touched)
+                                  ) {
+                                  <div
+                                    class="invalid-feedback"
+                                  ></div>
+                                }
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="offset-md-2 col-md-4 mb-3">
+                                <label for="city" class="form-label">Cidade</label>
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  formControlName="city"
+                                  id="city"
+                                  placeholder="Digite o nome da cidade."
+              [class.is-invalid]="
+                form.get('city')?.invalid &&
+                (form.get('city')?.dirty || form.get('city')?.touched)
+              "
+                                  required
+                                  />
+                                  @if (
+                                    form.get('city')?.invalid &&
+                                    (form.get('city')?.dirty || form.get('city')?.touched)
+                                    ) {
+                                    <div
+                                      class="invalid-feedback"
+                                    ></div>
+                                  }
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                  <label for="neighborhood" class="form-label">Bairro</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="neighborhood"
+                                    id="neighborhood"
+                                    placeholder="Digite o nome do bairro."
+              [class.is-invalid]="
+                form.get('neighborhood')?.invalid &&
+                (form.get('neighborhood')?.dirty ||
+                  form.get('neighborhood')?.touched)
+              "
+                                    required
+                                    />
+                                    @if (
+                                      form.get('neighborhood')?.invalid &&
+                                      (form.get('neighborhood')?.dirty ||
+                                      form.get('neighborhood')?.touched)
+                                      ) {
+                                      <div
+                                        class="invalid-feedback"
+                                      ></div>
+                                    }
+                                  </div>
+
+                                  <div class="offset-md-2 col-md-8 mb-3">
+                                    <label for="complement" class="form-label">Complemento</label>
+                                    <input
+                                      type="text"
+                                      class="form-control"
+                                      formControlName="complement"
+                                      id="complement"
+                                      placeholder="Digite o complemento do endereço."
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div class="row">
+                                    <div class="offset-md-2 col-md-8 mb-3">
+
+                                      <div class="d-grid gap-2">
+                                        @if (errorMessage) {
+                                          <div class="alert alert-danger">
+                                            {{ errorMessage }}
+                                          </div>
+                                        }
+                                        <button type="submit" class="btn btn-primary mt-3 w-100" [disabled]="form.invalid || isLoading">
+                                          @if (!isLoading) {
+                                            <span>Cadastrar</span>
+                                          }
+                                          @if (isLoading) {
+                                            <span class="spinner-grow spinner-grow-sm"  aria-hidden="true"></span>
+                                          }
+                                          @if (isLoading) {
+                                            <span role="status">Loading...</span>
+                                          }
+                                        </button>
+                                        <p class="mt-2">
+                                          Já está cadastrado? <a routerLink="/home">Clique Aqui.</a>
+                                        </p>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                </form>
+                              </section>
+                            </div>

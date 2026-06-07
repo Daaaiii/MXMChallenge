@@ -1,26 +1,29 @@
 <div class="container-fluid">
-    <div class="row align-items-center mt-5">
-      <h1>Login</h1>
-      <div *ngIf="errorMessage" class="alert alert-danger">
+  <div class="row align-items-center mt-5">
+    <h1>Login</h1>
+    @if (errorMessage) {
+      <div class="alert alert-danger">
         {{ errorMessage }}
-    </div>
+      </div>
+    }
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
-        <div class="form-group offset-md-2 col-md-8 mb-3">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            formControlName="email"
-            required
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
+      <div class="form-group offset-md-2 col-md-8 mb-3">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          formControlName="email"
+          required
           />
-          <div
-            *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
-            class="invalid-feedback"
-          >
-            Email inválido
-          </div>
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <div
+              class="invalid-feedback"
+              >
+              Email inválido
+            </div>
+          }
         </div>
         <div class="row">
           <div class="form-group offset-md-2 col-md-8 mb-3">
@@ -32,14 +35,14 @@
                 id="password"
                 formControlName="password"
                 required
-              />
-              <button
-                type="button"
-                class="input-group-text btn btn-outline-secondary"
-                aria-label="Alternar visibilidade da senha"
-                [attr.aria-pressed]="showPassword"
-                (click)="showPassword = !showPassword"
-              >
+                />
+                <button
+                  type="button"
+                  class="input-group-text btn btn-outline-secondary"
+                  aria-label="Alternar visibilidade da senha"
+                  [attr.aria-pressed]="showPassword"
+                  (click)="showPassword = !showPassword"
+                  >
                 <i
                   class="bi"
                   [class.bi-eye-fill]="!showPassword"
@@ -47,27 +50,34 @@
                 ></i>
               </button>
             </div>
-            <div
-              *ngIf="
-                form.get('password')?.invalid && form.get('password')?.touched
-              "
-              class="invalid-feedback"
-            >
-              Senha inválida
-            </div>
+            @if (
+              form.get('password')?.invalid && form.get('password')?.touched
+              ) {
+              <div
+                class="invalid-feedback"
+                >
+                Senha inválida
+              </div>
+            }
           </div>
         </div>
         <p class="mt-2">
           Ainda não está cadastrado? <a routerLink="/register">Clique Aqui.</a>
         </p>
         <button type="submit" class="btn btn-primary mt-2" [disabled]="form.invalid || isLoading">
-          <span *ngIf="!isLoading">Login</span>
-          <span *ngIf="isLoading" class="spinner-grow spinner-grow-sm"  aria-hidden="true"></span>
-          <span *ngIf="isLoading" role="status">Loading...</span>
+          @if (!isLoading) {
+            <span>Login</span>
+          }
+          @if (isLoading) {
+            <span class="spinner-grow spinner-grow-sm"  aria-hidden="true"></span>
+          }
+          @if (isLoading) {
+            <span role="status">Loading...</span>
+          }
         </button>
-        
-        
+
+
       </form>
     </div>
   </div>
-  
+

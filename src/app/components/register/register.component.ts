@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -18,12 +18,11 @@ import { RegisterFormDataDTO } from '../../models/authDTO';
 
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, NgxMaskDirective, NavbarComponent, RouterLink],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css',
-  providers:[provideNgxMask()]
+    selector: 'app-register',
+    imports: [ReactiveFormsModule, NgxMaskDirective, NavbarComponent, RouterLink],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.css',
+    providers: [provideNgxMask()]
 })
 export class RegisterComponent {
   private destroyRef = inject(DestroyRef);

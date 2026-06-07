@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-register-success',
-  standalone: true,
-  imports: [RouterLink],
-  templateUrl: './register-success.component.html',
-  styleUrl: './register-success.component.css'
+    selector: 'app-register-success',
+    imports: [RouterLink],
+    templateUrl: './register-success.component.html',
+    styleUrl: './register-success.component.css'
 })
 export class RegisterSuccessComponent {
   constructor(private router: Router) { }

@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-welcome',
-    standalone: true,
     templateUrl: './welcome.component.html',
     styleUrl: './welcome.component.css',
     imports: [SidebarComponent]

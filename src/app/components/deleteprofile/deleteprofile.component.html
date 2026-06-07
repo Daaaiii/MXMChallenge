@@ -5,9 +5,11 @@
         <div class="card-body">
           <h5 class="card-title">Confirmar Exclusão do Perfil</h5>
           <p class="card-text">Tem certeza de que deseja excluir seu perfil?</p>
-          <div *ngIf="feedbackMessage" class="alert alert-danger" role="alert">
-            {{ feedbackMessage }}
-          </div>
+          @if (feedbackMessage) {
+            <div class="alert alert-danger" role="alert">
+              {{ feedbackMessage }}
+            </div>
+          }
           <div class="text-center">
             <button class="btn btn-danger" type="button" [disabled]="isDeleting" (click)="confirmarExclusao()">
               Confirmar Exclusão

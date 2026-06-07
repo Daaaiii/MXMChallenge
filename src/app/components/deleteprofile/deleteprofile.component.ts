@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
-  selector: 'app-deleteprofile',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './deleteprofile.component.html',
-  styleUrl: './deleteprofile.component.css',
+    selector: 'app-deleteprofile',
+    imports: [],
+    templateUrl: './deleteprofile.component.html',
+    styleUrl: './deleteprofile.component.css'
 })
 export class DeleteprofileComponent {
   feedbackMessage = '';
