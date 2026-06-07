@@ -1,31 +1,23 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-auto bg-light sticky-top">
-            <div class="d-flex flex-md-column flex-row flex-nowrap bg-light align-items-center sticky-top">
-                <a routerLink ="/" class="d-block p-3 link-dark text-decoration-none custom-text" title="MXMChallenge" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only">
-                    <p class="navbar-brand"> MXMChallenge</p>
-                </a>
-                <ul class="nav nav-pills nav-flush flex-md-column flex-row flex-nowrap mb-auto mx-auto text-center align-items-center">
-                    <li class="nav-item">
-                        <a routerLink ="/welcome" class="nav-link py-3 px-2" title="Início" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Home">
-                            <i class="bi-house fs-1"></i>
-                        </a>
-                    </li>
-                   
-                    <li>
-                        <a routerLink="/profile" class="nav-link py-3 px-2" title="Perfil" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Perfil">
-                            <i class="bi-person-circle fs-1"></i>
-                        </a>
-                    </li>
-                    
-                    <li>
-                        <a (click)="onLogout()" class="nav-link py-3 px-2" title="Logout" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Logout">
-                            <i class="bi bi-box-arrow-right fs-1"></i>
-                        </a>
-                    </li>
-                </ul>
-                
-            </div>
-        </div>
-    </div>
-</div>
+<aside class="sidebar">
+  <a routerLink="/welcome" class="sidebar-brand" aria-label="MXMChallenge">
+    <span>MXM</span>
+    <strong>Challenge</strong>
+  </a>
+
+  <nav class="sidebar-nav" aria-label="Navegação principal">
+    <a routerLink="/welcome" routerLinkActive="active" class="sidebar-link">
+      <i class="bi bi-house"></i>
+      <span>Início</span>
+    </a>
+
+    <a routerLink="/profile" routerLinkActive="active" class="sidebar-link">
+      <i class="bi bi-person-circle"></i>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
+  <button type="button" class="sidebar-link logout" (click)="onLogout()">
+    <i class="bi bi-box-arrow-right"></i>
+    <span>Sair</span>
+  </button>
+</aside>

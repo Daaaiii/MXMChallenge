@@ -1,25 +1,32 @@
-<div class="container">
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Confirmar Exclusão do Perfil</h5>
-          <p class="card-text">Tem certeza de que deseja excluir seu perfil?</p>
-          @if (feedbackMessage) {
-            <div class="alert alert-danger" role="alert">
-              {{ feedbackMessage }}
-            </div>
-          }
-          <div class="text-center">
-            <button class="btn btn-danger" type="button" [disabled]="isDeleting" (click)="confirmarExclusao()">
-              Confirmar Exclusão
-            </button>
-            <button class="btn btn-secondary ml-2" type="button" [disabled]="isDeleting" (click)="cancelarExclusao()">
-              Cancelar
-            </button>
-          </div>
-        </div>
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <main class="app-main delete-main">
+    <section class="delete-card surface-card">
+      <div class="warning-icon" aria-hidden="true">
+        <i class="bi bi-exclamation-triangle"></i>
       </div>
-    </div>
-  </div>
+
+      <p class="eyebrow">Ação irreversível</p>
+      <h1>Confirmar Exclusão do Perfil</h1>
+      <p>
+        Ao confirmar, seus dados de perfil serão removidos. Revise com cuidado antes de continuar.
+      </p>
+
+      @if (feedbackMessage) {
+        <div class="alert alert-danger" role="alert">
+          {{ feedbackMessage }}
+        </div>
+      }
+
+      <div class="delete-actions">
+        <button class="btn btn-secondary" type="button" [disabled]="isDeleting" (click)="cancelarExclusao()">
+          Cancelar
+        </button>
+        <button class="btn btn-danger" type="button" [disabled]="isDeleting" (click)="confirmarExclusao()">
+          Confirmar Exclusão
+        </button>
+      </div>
+    </section>
+  </main>
 </div>

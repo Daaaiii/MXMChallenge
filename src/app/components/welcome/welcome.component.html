@@ -1,13 +1,31 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3">
-            <app-sidebar></app-sidebar>
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <main class="app-main">
+    <section class="welcome-hero surface-card">
+      <p class="eyebrow">Área do usuário</p>
+      <h1>Bem-vindo(a), {{ username || 'usuário' }}</h1>
+      <p>
+        Acompanhe seu perfil, revise seus dados cadastrais e mantenha suas informações sempre atualizadas.
+      </p>
+    </section>
+
+    <section class="quick-grid">
+      <a routerLink="/profile" class="quick-card surface-card">
+        <i class="bi bi-person-vcard"></i>
+        <div>
+          <h2>Ver perfil</h2>
+          <p>Confira seus dados pessoais, contato e endereço.</p>
         </div>
-        <div class="col-md-9">
-            <h1 class="mt-4 custom-title">Bem-vindo(a) ao MXMChallenge!!!</h1>
-            <p>Bem-vindo(a), <span class="custom-text mt-4">{{ username }}.</span></p>
-            <p class="custom-text mt-4">
-                "O sucesso não é final, o fracasso não é fatal: é a coragem de continuar que conta." - Winston Churchill
-            </p>
-    </div>
+      </a>
+
+      <a routerLink="/delete" class="quick-card surface-card danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        <div>
+          <h2>Excluir perfil</h2>
+          <p>Acesse a tela de confirmação para remover sua conta.</p>
+        </div>
+      </a>
+    </section>
+  </main>
 </div>

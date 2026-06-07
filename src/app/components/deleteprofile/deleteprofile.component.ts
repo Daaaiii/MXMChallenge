@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
     selector: 'app-deleteprofile',
-    imports: [],
+    imports: [SidebarComponent],
     templateUrl: './deleteprofile.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './deleteprofile.component.css'
@@ -36,7 +36,6 @@ export class DeleteprofileComponent {
   }
 
   cancelarExclusao() {
-   
-    this.router.navigate(['/profile']); 
+    this.router.navigate(['/profile']);
   }
 }

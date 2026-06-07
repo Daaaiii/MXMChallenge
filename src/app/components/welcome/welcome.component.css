@@ -1,11 +1,72 @@
-.custom-text{
-    font-size: 20px;
-    font-weight: bold;
-    color: #044992;
+.welcome-hero {
+  padding: 32px;
 }
 
-.custom-title{
-    font-size: 30px;
-    font-weight: bold;
-    color: #044992;
+.eyebrow {
+  color: var(--app-accent);
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.welcome-hero h1 {
+  color: var(--app-text);
+  font-size: 34px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.welcome-hero p {
+  color: var(--app-muted);
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 12px 0 0;
+  max-width: 720px;
+}
+
+.quick-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.quick-card {
+  align-items: flex-start;
+  color: var(--app-text);
+  display: flex;
+  gap: 16px;
+  padding: 22px;
+}
+
+.quick-card:hover {
+  color: var(--app-text);
+  transform: translateY(-1px);
+}
+
+.quick-card i {
+  color: var(--app-primary);
+  font-size: 28px;
+}
+
+.quick-card h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.quick-card p {
+  color: var(--app-muted);
+  margin: 6px 0 0;
+}
+
+.quick-card.danger i {
+  color: var(--app-danger);
+}
+
+@media (max-width: 760px) {
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
 }

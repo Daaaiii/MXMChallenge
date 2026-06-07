@@ -1,17 +1,8 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">MXM Challenge
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" [routerLink]="route"  style="cursor: pointer;">{{page}} </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  
+<header class="public-header">
+  <a class="brand" routerLink="/home" aria-label="MXM Challenge">
+    <span class="brand-mark">MXM</span>
+    <span>Challenge</span>
+  </a>
+
+  <a class="btn btn-outline-primary" [routerLink]="route">{{ page }}</a>
+</header>

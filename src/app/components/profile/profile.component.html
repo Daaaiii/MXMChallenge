@@ -1,33 +1,71 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-3">
-      <app-sidebar></app-sidebar>
-    </div>
-    <div class="col-md-9">
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <main class="app-main">
+    <header class="page-heading">
       <h1>Perfil</h1>
-      <div class="container mt-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{ user.fullname }}</h5>
-            <p class="card-text"><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ user.email }}</p>
-            <p class="card-text"><i class="fas fa-id-card"></i> <strong>CPF:</strong> {{ user.cpf_cnpj }}</p>
-            <p class="card-text"><i class="fas fa-phone"></i> <strong>DDD:</strong> {{ user.ddd }}</p>
-            <p class="card-text"><i class="fas fa-mobile-alt"></i> <strong>Telefone:</strong> {{ user.phoneNumber }}</p>
-            <p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong>CEP:</strong> {{ user.zipcode }}</p>
-            <p class="card-text"><i class="fas fa-road"></i> <strong>Rua:</strong> {{ user.street }}</p>
-            <p class="card-text"><i class="fas fa-building"></i> <strong>Número:</strong> {{ user.number }}</p>
-            <p class="card-text"><i class="fas fa-door-open"></i> <strong>Complemento:</strong> {{ user.complement }}</p>
-            <p class="card-text"><i class="fas fa-tree"></i> <strong>Bairro:</strong> {{ user.neighborhood }}</p>
-            <p class="card-text"><i class="fas fa-city"></i> <strong>Cidade:</strong> {{ user.city }}</p>
-            <p class="card-text"><i class="fas fa-flag"></i> <strong>Estado:</strong> {{ user.state }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-          <button class="btn btn-danger mt-2 col-md-6" (click)="deleteProfile()">Deletar Perfil</button>
-          </div>          
-        </div>
+      <p>Revise as informações vinculadas à sua conta.</p>
+    </header>
+
+    <section class="profile-summary surface-card">
+      <div>
+        <span>Usuário</span>
+        <h2>{{ user.fullname || username || 'Perfil' }}</h2>
       </div>
-    </div>
-  </div>
+
+      <button class="btn btn-danger" type="button" (click)="deleteProfile()">
+        Deletar Perfil
+      </button>
+    </section>
+
+    <section class="info-grid">
+      <article class="info-section surface-card">
+        <h2>Dados pessoais</h2>
+        <div class="info-item">
+          <span>Nome completo</span>
+          <strong>{{ user.fullname || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>CPF/CNPJ</span>
+          <strong>{{ user.cpf_cnpj || '-' }}</strong>
+        </div>
+      </article>
+
+      <article class="info-section surface-card">
+        <h2>Contato</h2>
+        <div class="info-item">
+          <span>Email</span>
+          <strong>{{ user.email || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Telefone</span>
+          <strong>({{ user.ddd || '--' }}) {{ user.phoneNumber || '-' }}</strong>
+        </div>
+      </article>
+
+      <article class="info-section surface-card">
+        <h2>Endereço</h2>
+        <div class="info-item">
+          <span>CEP</span>
+          <strong>{{ user.zipcode || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Rua e número</span>
+          <strong>{{ user.street || '-' }}, {{ user.number || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Complemento</span>
+          <strong>{{ user.complement || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Bairro</span>
+          <strong>{{ user.neighborhood || '-' }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Cidade/Estado</span>
+          <strong>{{ user.city || '-' }} / {{ user.state || '-' }}</strong>
+        </div>
+      </article>
+    </section>
+  </main>
 </div>

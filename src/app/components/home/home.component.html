@@ -1,15 +1,27 @@
-
 <app-navbar [page]="page" [route]="route"></app-navbar>
-<div class="container text-center mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <img src="assets/technology.png" alt="Technology Image" class="img-fluid rounded home-image">
-        <h1 class="mt-4">Bem-vindo ao MXM Challenge</h1>
-        <p class="lead">Explorando novas tecnologias para inovar o futuro.</p>
-      </div>
-      <div class="col-md-6">
-        <app-login/>
+
+<main class="home-page">
+  <section class="home-hero">
+    <div class="home-copy">
+      <p class="eyebrow">Cadastro e autenticação</p>
+      <h1>MXM Challenge</h1>
+      <p class="lead">
+        Uma experiência simples para criar conta, entrar com segurança e manter seus dados de perfil organizados.
+      </p>
+
+      <div class="feature-row" aria-label="Principais recursos">
+        <span><i class="bi bi-shield-check"></i> Acesso protegido</span>
+        <span><i class="bi bi-geo-alt"></i> Busca por CEP</span>
+        <span><i class="bi bi-person-vcard"></i> Perfil completo</span>
       </div>
     </div>
-  </div>
-  
+
+    <div class="home-media">
+      <img src="assets/technology.png" alt="Pessoa usando tecnologia" />
+    </div>
+  </section>
+
+  <aside class="login-panel surface-card">
+    <app-login />
+  </aside>
+</main>
