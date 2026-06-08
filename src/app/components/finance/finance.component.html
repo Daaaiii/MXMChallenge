@@ -1,0 +1,596 @@
+<div class="app-shell">
+  <app-sidebar></app-sidebar>
+
+  <main class="app-main finance-page">
+    <header class="page-heading finance-heading">
+      <div>
+        <h1>Controle financeiro</h1>
+        <p>Organize entradas, saídas, contas, cartões, investimentos, faturas e metas.</p>
+      </div>
+      <label class="month-picker">
+        Mês de referência
+        <input class="form-control" type="month" [value]="selectedMonth" (change)="onMonthChange($event)" />
+      </label>
+    </header>
+
+    <nav class="finance-tabs" aria-label="Seções financeiras">
+      <button type="button" [class.active]="activeTab === 'dashboard'" (click)="setTab('dashboard')">Dashboard</button>
+      <button type="button" [class.active]="activeTab === 'accounts'" (click)="setTab('accounts')">Contas</button>
+      <button type="button" [class.active]="activeTab === 'incomes'" (click)="setTab('incomes')">Entradas</button>
+      <button type="button" [class.active]="activeTab === 'expenses'" (click)="setTab('expenses')">Despesas</button>
+      <button type="button" [class.active]="activeTab === 'cards'" (click)="setTab('cards')">Cartões</button>
+      <button type="button" [class.active]="activeTab === 'invoices'" (click)="setTab('invoices')">Faturas</button>
+      <button type="button" [class.active]="activeTab === 'goals'" (click)="setTab('goals')">Metas</button>
+      <button type="button" [class.active]="activeTab === 'investments'" (click)="setTab('investments')">Investimentos</button>
+      <button type="button" [class.active]="activeTab === 'charts'" (click)="setTab('charts')">Gráficos</button>
+    </nav>
+
+    @if (feedbackMessage) {
+      <div class="finance-alert" [class.success]="feedbackType === 'success'" [class.error]="feedbackType === 'error'">
+        {{ feedbackMessage }}
+      </div>
+    }
+
+    @if (activeTab === 'dashboard') {
+      <section class="tab-panel">
+        <section class="summary-grid dashboard-summary">
+          <article class="summary-card surface-card"><span>Entradas</span><strong>{{ currency(monthlyBalance().income) }}</strong></article>
+          <article class="summary-card surface-card"><span>Saídas</span><strong>{{ currency(monthlyBalance().expense) }}</strong></article>
+          <article class="summary-card surface-card"><span>Saldo previsto</span><strong>{{ currency(monthlyBalance().balance) }}</strong></article>
+          <article class="summary-card surface-card"><span>Cartões no mês</span><strong>{{ currency(monthlyBalance().creditCardExpense) }}</strong></article>
+          <article class="summary-card surface-card"><span>Investimentos</span><strong>{{ currency(investmentsTotal()) }}</strong></article>
+          <article class="summary-card surface-card"><span>Patrimonio</span><strong>{{ currency(netWorthSummary().netWorth) }}</strong></article>
+        </section>
+
+        <section class="summary-grid">
+          <article class="summary-card surface-card"><span>Saldo liquido</span><strong>{{ currency(netWorthSummary().liquidBalance) }}</strong></article>
+          <article class="summary-card surface-card"><span>Reservas</span><strong>{{ currency(netWorthSummary().reservedTotal) }}</strong></article>
+          <article class="summary-card surface-card"><span>Contas cadastradas</span><strong>{{ state.accounts.length }}</strong></article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="finance-panel surface-card">
+            <h2>Lançamentos do mês</h2>
+            <div class="list-stack">
+              @for (launch of monthlyLaunches(); track launch.id) {
+                <div class="list-item">
+                  <strong>{{ launch.description }}</strong>
+                  <span>{{ launch.category }} · {{ launch.paymentLabel }} · {{ launch.date }} · {{ currency(launch.amount) }}</span>
+                </div>
+              } @empty {
+                <p class="empty-state">Nenhum lançamento no mês selecionado.</p>
+              }
+            </div>
+          </article>
+
+          <article class="finance-panel surface-card">
+            <h2>Alertas</h2>
+            <div class="alert-list">
+              @if (hasNegativeBalance()) {
+                <div class="finance-alert danger">Saldo previsto negativo para o mês selecionado.</div>
+              }
+              @if (hasCardNearLimit()) {
+                <div class="finance-alert warning">Há cartão com 80% ou mais do limite comprometido.</div>
+              }
+              @if (hasOverdueGoal()) {
+                <div class="finance-alert warning">Existem metas vencidas sem conclusão.</div>
+              }
+              @if (!hasNegativeBalance() && !hasCardNearLimit() && !hasOverdueGoal()) {
+                <div class="finance-alert success">Nenhum alerta crítico para este mês.</div>
+              }
+            </div>
+          </article>
+        </section>
+      </section>
+    }
+
+    @if (activeTab === 'accounts') {
+      <section class="tab-panel finance-grid">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingAccountId ? 'Editar conta' : 'Nova conta' }}</h2>
+          <form [formGroup]="accountForm" (ngSubmit)="saveAccount()" class="form-stack">
+            <div class="two-columns">
+              <label>Banco<input class="form-control" formControlName="bankName" placeholder="Itaú, Nubank, Inter" /></label>
+              <label>Nome da conta<input class="form-control" formControlName="accountName" placeholder="Conta salário, principal" /></label>
+            </div>
+            <div class="two-columns">
+              <label>
+                Tipo
+                <select class="form-select" formControlName="accountType">
+                  <option value="Conta corrente">Conta corrente</option>
+                  <option value="Conta poupança">Conta poupança</option>
+                  <option value="Carteira">Carteira</option>
+                  <option value="Corretora">Corretora</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </label>
+              <label>Saldo inicial<input class="form-control" type="number" min="0" step="0.01" formControlName="initialBalance" /></label>
+            </div>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingAccountId ? 'Salvar conta' : 'Cadastrar conta' }}</button>
+              @if (editingAccountId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelAccountEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Contas cadastradas</h2>
+          <div class="list-stack">
+            @for (account of state.accounts; track account.id) {
+              <div class="list-item">
+                <div>
+                  <strong>{{ account.bankName }} · {{ account.accountName }}</strong>
+                  <span>{{ account.accountType }} · saldo inicial {{ currency(account.initialBalance) }} · saldo estimado {{ currency(accountBalance(account.id)) }}</span>
+                </div>
+                <div class="button-row">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editAccount(account)">Editar</button>
+                  <button class="btn btn-sm btn-danger" type="button" (click)="deleteAccount(account.id)">Excluir</button>
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-state">Nenhuma conta cadastrada.</p>
+            }
+          </div>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Saldos por conta</h2>
+          <div class="list-stack">
+            @for (summary of accountSummaries(); track summary.account.id) {
+              <div class="goal-item">
+                <div>
+                  <strong>{{ summary.account.bankName }} · {{ summary.account.accountName }}</strong>
+                  <span>Saldo liquido estimado {{ currency(summary.estimatedBalance) }}</span>
+                </div>
+                <div class="category-list">
+                  <div class="category-row"><span>Entradas</span><strong>{{ currency(summary.incomeTotal) }}</strong></div>
+                  <div class="category-row"><span>Saidas</span><strong>{{ currency(summary.expenseTotal) }}</strong></div>
+                  <div class="category-row"><span>Reservado</span><strong>{{ currency(summary.reservedTotal) }}</strong></div>
+                  <div class="category-row"><span>Investido</span><strong>{{ currency(summary.investmentTotal) }}</strong></div>
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-state">Cadastre uma conta para calcular saldos.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'incomes') {
+      <section class="tab-panel finance-grid">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingIncomeId ? 'Editar entrada' : 'Nova entrada' }}</h2>
+          <form [formGroup]="incomeForm" (ngSubmit)="saveIncome()" class="form-stack">
+            <label>Descrição<input class="form-control" formControlName="description" placeholder="Salário, freelance, reembolso" /></label>
+            <div class="two-columns">
+              <label>
+                Categoria
+                <select class="form-select" formControlName="category">
+                  @for (category of incomeCategories; track category) {
+                    <option [value]="category">{{ category }}</option>
+                  }
+                </select>
+              </label>
+              <label>Valor<input class="form-control" type="number" min="0" step="0.01" formControlName="amount" /></label>
+            </div>
+            <div class="two-columns">
+              <label>Data em que entrou<input class="form-control" type="date" formControlName="date" /></label>
+              <label>
+                Conta de destino
+                <select class="form-select" formControlName="accountId">
+                  <option value="">Não informar</option>
+                  @for (account of state.accounts; track account.id) {
+                    <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <label class="checkbox-label"><input type="checkbox" formControlName="recurring" /> Repetir todos os meses</label>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingIncomeId ? 'Salvar entrada' : 'Cadastrar entrada' }}</button>
+              @if (editingIncomeId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelIncomeEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Entradas do mês</h2>
+          <div class="list-stack">
+            @for (income of monthlyIncomes(); track income.id) {
+              <div class="list-item">
+                <div>
+                  <strong>{{ income.description }}</strong>
+                  <span>{{ income.category }} · entrou em {{ income.date }} · {{ accountLabel(income.accountId) }} · {{ currency(income.amount) }}</span>
+                </div>
+                <div class="button-row">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editIncome(income)">Editar</button>
+                  <button class="btn btn-sm btn-danger" type="button" (click)="deleteIncome(income.id)">Excluir</button>
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-state">Nenhuma entrada registrada para este mês.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'expenses') {
+      <section class="tab-panel finance-grid">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingExpenseId ? 'Editar despesa' : 'Nova despesa' }}</h2>
+          <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()" class="form-stack">
+            <label>Descrição<input class="form-control" formControlName="description" placeholder="Mercado, aluguel, farmácia" /></label>
+            <div class="two-columns">
+              <label>
+                Categoria
+                <select class="form-select" formControlName="category">
+                  @for (category of expenseCategories; track category) {
+                    <option [value]="category">{{ category }}</option>
+                  }
+                </select>
+              </label>
+              <label>Valor total<input class="form-control" type="number" min="0" step="0.01" formControlName="amount" /></label>
+            </div>
+            <div class="two-columns">
+              <label>Data da compra<input class="form-control" type="date" formControlName="date" /></label>
+              <label>
+                Origem do pagamento
+                <select class="form-select" formControlName="paymentSource" (change)="onPaymentMethodChange()">
+                  <option value="">Selecione a origem</option>
+                  @for (source of paymentSourceOptions(); track source.value) {
+                    <option [value]="source.value">{{ source.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            @if (isCreditCardPayment()) {
+              <div class="two-columns">
+                <label>Parcelas<input class="form-control" type="number" min="1" max="48" formControlName="installments" /></label>
+              </div>
+            }
+            <label>Observação<input class="form-control" formControlName="notes" placeholder="Opcional" /></label>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingExpenseId ? 'Salvar despesa' : 'Cadastrar despesa' }}</button>
+              @if (editingExpenseId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelExpenseEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Lançamentos de despesas</h2>
+          <div class="list-stack">
+            @for (expense of monthlyExpenses(); track expense.id) {
+              <div class="list-item">
+                <div><strong>{{ expense.description }}</strong><span>{{ expense.category }} · {{ expensePaymentLabel(expense) }} · {{ expense.date }} · {{ currency(expense.amount) }}</span></div>
+                <div class="button-row">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editExpense(expense)">Editar</button>
+                  <button class="btn btn-sm btn-danger" type="button" (click)="deleteExpense(expense.id)">Excluir</button>
+                </div>
+              </div>
+            }
+            @for (expense of cardExpenses(); track expense.id) {
+              <div class="list-item">
+                <div><strong>{{ expense.description }}</strong><span>{{ expense.category }} · {{ expensePaymentLabel(expense) }} · compra em {{ expense.date }} · {{ expense.installments }}x · {{ currency(expense.amount) }}</span></div>
+                <div class="button-row">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editExpense(expense)">Editar</button>
+                  <button class="btn btn-sm btn-danger" type="button" (click)="deleteExpense(expense.id)">Excluir</button>
+                </div>
+              </div>
+            } @empty {
+              @if (!monthlyExpenses().length) {
+                <p class="empty-state">Nenhuma despesa cadastrada.</p>
+              }
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'cards') {
+      <section class="tab-panel">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingCardId ? 'Editar cartão' : 'Cartões de crédito' }}</h2>
+          <form [formGroup]="cardForm" (ngSubmit)="saveCard()" class="form-stack compact">
+            <label>Nome do cartão<input class="form-control" formControlName="name" placeholder="Nubank, Itaú, Inter" /></label>
+            <div class="three-columns">
+              <label>Limite total<input class="form-control" type="number" min="0" formControlName="limit" placeholder="0,00" /></label>
+              <label>Fecha dia<input class="form-control" type="number" min="1" max="31" formControlName="closingDay" placeholder="1" /></label>
+              <label>Vence dia<input class="form-control" type="number" min="1" max="31" formControlName="dueDay" placeholder="10" /></label>
+            </div>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingCardId ? 'Salvar cartão' : 'Cadastrar cartão' }}</button>
+              @if (editingCardId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelCardEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+
+          <div class="card-grid">
+            @for (card of state.cards; track card.id) {
+              <div class="credit-card">
+                <div class="credit-card-header">
+                  <div><span>Cartão</span><strong>{{ card.name }}</strong></div>
+                  <div class="button-row">
+                    <button class="btn btn-sm btn-light" type="button" (click)="editCard(card)">Editar</button>
+                    <button class="btn btn-sm btn-danger" type="button" (click)="deleteCard(card.id)">Excluir</button>
+                  </div>
+                </div>
+                <div class="credit-limit"><div><span>Fatura do mês</span><strong>{{ currency(cardInvoiceTotal(card.id)) }}</strong></div><div><span>Limite total</span><strong>{{ currency(card.limit) }}</strong></div></div>
+                <div class="progress-track" aria-label="Uso do limite do cartão"><div class="progress-fill" [style.width.%]="cardUsagePercent(card.id, card.limit)"></div></div>
+                <div class="credit-meta"><span>Limite comprometido: {{ currency(cardUsedLimit(card.id)) }}</span><span>Disponível: {{ currency(cardAvailableLimit(card.id, card.limit)) }}</span><span>Fecha dia {{ card.closingDay }}</span><span>Vence dia {{ card.dueDay }}</span></div>
+              </div>
+            } @empty {
+              <p class="empty-state">Nenhum cartão cadastrado.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'invoices') {
+      <section class="tab-panel">
+        @for (card of state.cards; track card.id) {
+          <article class="finance-panel surface-card">
+            <h2>{{ card.name }} · fatura de {{ selectedMonth }} · {{ currency(cardInvoiceTotal(card.id)) }}</h2>
+            <div class="list-stack">
+              @for (installment of cardInvoice(card.id); track installment.expenseId + installment.installmentNumber) {
+                <div class="list-item"><strong>{{ installment.description }}</strong><span>Compra em {{ installment.purchaseDate }} · parcela {{ installment.installmentNumber }}/{{ installment.installments }} · {{ currency(installment.amount) }}</span></div>
+              } @empty {
+                <p class="empty-state">Sem parcelas neste cartão para o mês selecionado.</p>
+              }
+            </div>
+          </article>
+        } @empty {
+          <article class="finance-panel surface-card"><p class="empty-state">Cadastre um cartão para acompanhar faturas.</p></article>
+        }
+      </section>
+    }
+
+    @if (activeTab === 'goals') {
+      <section class="tab-panel finance-grid">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingGoalId ? 'Editar meta' : 'Nova meta' }}</h2>
+          <form [formGroup]="goalForm" (ngSubmit)="saveGoal()" class="form-stack compact">
+            <label>Nome da meta<input class="form-control" formControlName="name" placeholder="Reserva, viagem, curso" /></label>
+            <div class="two-columns">
+              <label>Valor objetivo<input class="form-control" type="number" min="1" formControlName="targetAmount" placeholder="0,00" /></label>
+              <label>Prazo<input class="form-control" type="date" formControlName="deadline" /></label>
+            </div>
+            <label>
+              Banco/conta da reserva
+              <select class="form-select" formControlName="accountId">
+                <option value="">Não informar</option>
+                @for (account of state.accounts; track account.id) {
+                  <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+                }
+              </select>
+            </label>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingGoalId ? 'Salvar meta' : 'Criar meta' }}</button>
+              @if (editingGoalId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelGoalEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+
+          <h2>Adicionar valor à meta</h2>
+          <form [formGroup]="contributionForm" (ngSubmit)="addGoalContribution()" class="form-stack">
+            <label>
+              Meta
+              <select class="form-select" formControlName="goalId">
+                @for (goal of state.goals; track goal.id) {
+                  <option [value]="goal.id">{{ goal.name }}</option>
+                }
+              </select>
+            </label>
+            <div class="two-columns">
+              <label>Valor<input class="form-control" type="number" min="0" step="0.01" formControlName="amount" /></label>
+              <label>Data<input class="form-control" type="date" formControlName="date" /></label>
+            </div>
+            <label>
+              Banco/conta onde salvou
+              <select class="form-select" formControlName="accountId">
+                <option value="">Não informar</option>
+                @for (account of state.accounts; track account.id) {
+                  <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+                }
+              </select>
+            </label>
+            <label>Observação<input class="form-control" formControlName="notes" placeholder="Opcional" /></label>
+            <button class="btn btn-primary" type="submit">Adicionar valor</button>
+          </form>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Metas</h2>
+          <div class="goal-list">
+            @for (goal of state.goals; track goal.id) {
+              <div class="goal-item">
+                <div><strong>{{ goal.name }} {{ goal.completed ? '· concluída' : '' }}</strong><span>{{ currency(goal.currentAmount) }} de {{ currency(goal.targetAmount) }} até {{ goal.deadline }} · {{ accountLabel(goal.accountId) }}</span></div>
+                <div class="progress-track"><div class="progress-fill" [style.width.%]="goalProgress(goal.currentAmount, goal.targetAmount)"></div></div>
+                <div class="button-row">
+                  <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editGoal(goal)">Editar</button>
+                  <button class="btn btn-sm btn-danger" type="button" (click)="deleteGoal(goal.id)">Excluir</button>
+                </div>
+                <div class="list-stack">
+                  @for (contribution of goal.contributions; track contribution.id) {
+                    <div class="list-item">
+                      <div>
+                        <strong>{{ currency(contribution.amount) }}</strong>
+                        <span>{{ contribution.date }} · {{ accountLabel(contribution.accountId) }} {{ contribution.notes ? '· ' + contribution.notes : '' }}</span>
+                      </div>
+                      <button class="btn btn-sm btn-danger" type="button" (click)="deleteGoalContribution(goal.id, contribution.id)">Excluir</button>
+                    </div>
+                  } @empty {
+                    <p class="empty-state">Nenhum valor adicionado ainda.</p>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-state">Nenhuma meta planejada.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'investments') {
+      <section class="tab-panel finance-grid">
+        <article class="finance-panel surface-card">
+          <h2>{{ editingInvestmentId ? 'Editar investimento' : 'Novo investimento' }}</h2>
+          <form [formGroup]="investmentForm" (ngSubmit)="saveInvestment()" class="form-stack">
+            <label>Nome<input class="form-control" formControlName="name" placeholder="Reserva emergência, CDB liquidez diária" /></label>
+            <div class="two-columns">
+              <label>
+                Tipo
+                <select class="form-select" formControlName="type">
+                  @for (type of investmentTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </label>
+              <label>Instituição<input class="form-control" formControlName="institution" placeholder="Banco ou corretora" /></label>
+            </div>
+            <label>
+              Conta/corretora
+              <select class="form-select" formControlName="accountId">
+                <option value="">Não informar</option>
+                @for (account of state.accounts; track account.id) {
+                  <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+                }
+              </select>
+            </label>
+            <div class="two-columns">
+              <label>Valor aplicado<input class="form-control" type="number" min="0" step="0.01" formControlName="investedAmount" /></label>
+              <label>Valor atual<input class="form-control" type="number" min="0" step="0.01" formControlName="currentAmount" /></label>
+            </div>
+            <div class="two-columns">
+              <label>
+                Indexador
+                <select class="form-select" formControlName="indexer">
+                  @for (indexer of investmentIndexers; track indexer) {
+                    <option [value]="indexer">{{ indexer }}</option>
+                  }
+                </select>
+              </label>
+              <label>Rentabilidade (% ao ano)<input class="form-control" type="number" min="0" step="0.01" formControlName="profitabilityRate" /></label>
+            </div>
+            <div class="two-columns">
+              <label>
+                Liquidez
+                <select class="form-select" formControlName="liquidity">
+                  @for (liquidity of investmentLiquidities; track liquidity) {
+                    <option [value]="liquidity">{{ liquidity }}</option>
+                  }
+                </select>
+              </label>
+              <label>Vencimento<input class="form-control" type="date" formControlName="maturityDate" /></label>
+            </div>
+            <div class="two-columns">
+              <label>Data de início<input class="form-control" type="date" formControlName="startDate" /></label>
+              <label>Liquidez/vencimento<input class="form-control" type="date" formControlName="liquidityDate" /></label>
+            </div>
+            <label>Observação<input class="form-control" formControlName="notes" placeholder="Opcional" /></label>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">{{ editingInvestmentId ? 'Salvar investimento' : 'Cadastrar investimento' }}</button>
+              @if (editingInvestmentId) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelInvestmentEdit()">Cancelar</button>
+              }
+            </div>
+          </form>
+
+          <h2>Resgatar ou transferir</h2>
+          <form [formGroup]="redemptionForm" (ngSubmit)="redeemInvestment()" class="form-stack">
+            <label>
+              Investimento
+              <select class="form-select" formControlName="investmentId">
+                <option value="">Selecione</option>
+                @for (investment of state.investments; track investment.id) {
+                  <option [value]="investment.id">{{ investment.name }} · {{ currency(investment.currentAmount) }}</option>
+                }
+              </select>
+            </label>
+            <div class="two-columns">
+              <label>Valor do resgate<input class="form-control" type="number" min="0" step="0.01" formControlName="amount" /></label>
+              <label>Data<input class="form-control" type="date" formControlName="date" /></label>
+            </div>
+            <label>
+              Conta de destino
+              <select class="form-select" formControlName="accountId">
+                <option value="">Selecione</option>
+                @for (account of state.accounts; track account.id) {
+                  <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+                }
+              </select>
+            </label>
+            <label>Observação<input class="form-control" formControlName="notes" placeholder="Opcional" /></label>
+            <button class="btn btn-primary" type="submit">Registrar resgate</button>
+          </form>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Investimentos e reservas</h2>
+          <div class="list-stack">
+            @for (group of investmentGroups(); track group.type) {
+              <div class="goal-item">
+                <div>
+                  <strong>{{ group.type }}</strong>
+                  <span>Aplicado {{ currency(group.totalInvested) }} · atual {{ currency(group.totalCurrent) }} · ganho {{ currency(group.totalGain) }}</span>
+                </div>
+                <div class="list-stack">
+                  @for (item of group.items; track item.investment.id) {
+                    <div class="list-item">
+                      <div>
+                        <strong>{{ item.investment.name }}</strong>
+                        <span>{{ item.investment.institution }} · {{ accountLabel(item.investment.accountId) }} · atual {{ currency(item.investment.currentAmount) }} · ganho {{ currency(item.gain) }} ({{ percent(item.gainPercent) }})</span>
+                        <span>{{ item.investment.indexer || 'Indexador não informado' }} · {{ item.investment.profitabilityRate ? percent(item.investment.profitabilityRate) + ' ao ano' : 'Rentabilidade não informada' }} · {{ item.investment.liquidity || 'Liquidez não informada' }} {{ item.investment.maturityDate ? '· vence em ' + item.investment.maturityDate : '' }}</span>
+                      </div>
+                      <div class="button-row">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="editInvestment(item.investment)">Editar</button>
+                        <button class="btn btn-sm btn-danger" type="button" (click)="deleteInvestment(item.investment.id)">Excluir</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <p class="empty-state">Nenhum investimento cadastrado.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'charts') {
+      <section class="tab-panel charts-grid">
+        <article class="finance-panel surface-card">
+          <h2>Evolução mensal</h2>
+          <div class="bar-chart" aria-label="Gráfico de saídas mensais">
+            @for (month of monthlySummaries(); track month.month) {
+              <div class="bar-column"><div class="bar-value">{{ currency(month.expense) }}</div><div class="bar" [style.height.px]="barHeight(month.expense)"></div><span>{{ month.label }}</span></div>
+            }
+          </div>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Gastos por categoria</h2>
+          <div class="category-list">
+            @for (item of categoryTotals(); track item.category) {
+              <div class="category-row"><span>{{ item.category }}</span><strong>{{ currency(item.total) }}</strong></div>
+            } @empty {
+              <p class="empty-state">Nenhuma categoria com gastos.</p>
+            }
+          </div>
+        </article>
+      </section>
+    }
+  </main>
+</div>

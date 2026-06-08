@@ -22,10 +22,10 @@ export const routes: Routes = [
         (m) => m.RegisterSuccessComponent
       ),
   },
- 
+
   {
     path: '',
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
     children: [
       {
         path: 'profile',
@@ -48,8 +48,16 @@ export const routes: Routes = [
             (m) => m.DeleteprofileComponent
           ),
       }
-     
-      
+      ,
+      {
+        path: 'finance',
+        loadComponent: () =>
+          import('./components/finance/finance.component').then(
+            (m) => m.FinanceComponent
+          ),
+      }
+
+
     ],
   },
   {
