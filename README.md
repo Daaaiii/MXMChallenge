@@ -44,6 +44,10 @@ npm run build
 npm test
 ```
 
+## Roadmap financeiro
+
+O plano de evoluÃ§Ã£o do modulo financeiro esta documentado em [docs/finance-roadmap.md](docs/finance-roadmap.md). As fases futuras devem ser aprovadas separadamente antes da implementaÃ§Ã£o.
+
 ## API
 
 A URL da API fica configurada em `src/environments/environment.ts` e `src/environments/environment.prod.ts`.
