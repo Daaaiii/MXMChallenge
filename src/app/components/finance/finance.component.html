@@ -31,6 +31,56 @@
       </div>
     }
 
+    <section class="finance-panel surface-card finance-filters">
+      <div class="filter-heading">
+        <h2>Filtros</h2>
+        @if (hasActiveFilters()) {
+          <button class="btn btn-sm btn-outline-secondary" type="button" (click)="clearFilters()">Limpar filtros</button>
+        }
+      </div>
+      <form [formGroup]="filterForm" class="form-stack">
+        <div class="four-columns">
+          <label>
+            Categoria
+            <select class="form-select" formControlName="category">
+              <option value="">Todas</option>
+              @for (category of allFilterCategories(); track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            Tipo
+            <select class="form-select" formControlName="paymentMethod">
+              <option value="">Todos</option>
+              <option value="income">Entradas</option>
+              <option value="pix">Pix</option>
+              <option value="cash">Dinheiro</option>
+              <option value="credit-card">Cartao</option>
+            </select>
+          </label>
+          <label>
+            Conta
+            <select class="form-select" formControlName="accountId">
+              <option value="">Todas</option>
+              @for (account of state.accounts; track account.id) {
+                <option [value]="account.id">{{ accountOptionLabel(account) }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            Cartao
+            <select class="form-select" formControlName="cardId">
+              <option value="">Todos</option>
+              @for (card of state.cards; track card.id) {
+                <option [value]="card.id">{{ card.name }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </form>
+    </section>
+
     @if (activeTab === 'dashboard') {
       <section class="tab-panel">
         <section class="summary-grid dashboard-summary">
@@ -52,7 +102,7 @@
           <article class="finance-panel surface-card">
             <h2>Lançamentos do mês</h2>
             <div class="list-stack">
-              @for (launch of monthlyLaunches(); track launch.id) {
+              @for (launch of filteredMonthlyLaunches(); track launch.id) {
                 <div class="list-item">
                   <strong>{{ launch.description }}</strong>
                   <span>{{ launch.category }} · {{ launch.paymentLabel }} · {{ launch.date }} · {{ currency(launch.amount) }}</span>
@@ -201,7 +251,7 @@
         <article class="finance-panel surface-card">
           <h2>Entradas do mês</h2>
           <div class="list-stack">
-            @for (income of monthlyIncomes(); track income.id) {
+            @for (income of filteredMonthlyIncomes(); track income.id) {
               <div class="list-item">
                 <div>
                   <strong>{{ income.description }}</strong>
@@ -267,7 +317,7 @@
         <article class="finance-panel surface-card">
           <h2>Lançamentos de despesas</h2>
           <div class="list-stack">
-            @for (expense of monthlyExpenses(); track expense.id) {
+            @for (expense of filteredMonthlyExpenses(); track expense.id) {
               <div class="list-item">
                 <div><strong>{{ expense.description }}</strong><span>{{ expense.category }} · {{ expensePaymentLabel(expense) }} · {{ expense.date }} · {{ currency(expense.amount) }}</span></div>
                 <div class="button-row">
@@ -276,7 +326,7 @@
                 </div>
               </div>
             }
-            @for (expense of cardExpenses(); track expense.id) {
+            @for (expense of filteredCardExpenses(); track expense.id) {
               <div class="list-item">
                 <div><strong>{{ expense.description }}</strong><span>{{ expense.category }} · {{ expensePaymentLabel(expense) }} · compra em {{ expense.date }} · {{ expense.installments }}x · {{ currency(expense.amount) }}</span></div>
                 <div class="button-row">
@@ -285,7 +335,7 @@
                 </div>
               </div>
             } @empty {
-              @if (!monthlyExpenses().length) {
+              @if (!filteredMonthlyExpenses().length && !filteredCardExpenses().length) {
                 <p class="empty-state">Nenhuma despesa cadastrada.</p>
               }
             }

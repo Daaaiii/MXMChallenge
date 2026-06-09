@@ -8,6 +8,7 @@ import {
   Expense,
   FinanceCategory,
   FinanceGoal,
+  FinanceLaunch,
   FinanceState,
   Income,
   IncomeCategory,
@@ -152,6 +153,13 @@ export class FinanceComponent implements OnInit {
     date: [new Date().toISOString().slice(0, 10), Validators.required],
     accountId: ['', Validators.required],
     notes: [''],
+  });
+
+  filterForm = this.fb.group({
+    category: [''],
+    paymentMethod: [''],
+    accountId: [''],
+    cardId: [''],
   });
 
   constructor(private fb: FormBuilder, private financeService: FinanceService) {}
@@ -584,6 +592,10 @@ export class FinanceComponent implements OnInit {
     return this.financeService.getMonthlyIncomes(this.selectedMonth, this.state);
   }
 
+  filteredMonthlyIncomes(): Income[] {
+    return this.monthlyIncomes().filter((income) => this.matchesIncomeFilters(income));
+  }
+
   monthlyExpenses() {
     return [...this.state.expenses]
       .filter((expense) => expense.paymentMethod !== 'credit-card' && expense.date.slice(0, 7) === this.selectedMonth)
@@ -598,6 +610,36 @@ export class FinanceComponent implements OnInit {
 
   monthlyLaunches() {
     return this.financeService.getMonthlyLaunches(this.selectedMonth, this.state);
+  }
+
+  filteredMonthlyLaunches(): FinanceLaunch[] {
+    return this.monthlyLaunches().filter((launch) => this.matchesLaunchFilters(launch));
+  }
+
+  filteredMonthlyExpenses(): Expense[] {
+    return this.monthlyExpenses().filter((expense) => this.matchesExpenseFilters(expense));
+  }
+
+  filteredCardExpenses(): Expense[] {
+    return this.cardExpenses().filter((expense) => this.matchesExpenseFilters(expense));
+  }
+
+  allFilterCategories(): string[] {
+    return Array.from(new Set([...this.incomeCategories, ...this.expenseCategories]));
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset({
+      category: '',
+      paymentMethod: '',
+      accountId: '',
+      cardId: '',
+    });
+  }
+
+  hasActiveFilters(): boolean {
+    const filters = this.filterForm.getRawValue();
+    return !!(filters.category || filters.paymentMethod || filters.accountId || filters.cardId);
   }
 
   openInstallments(): MonthlyInstallment[] {
@@ -757,6 +799,80 @@ export class FinanceComponent implements OnInit {
   private showDeleteResult(result: { success: boolean; message: string }): void {
     this.feedbackMessage = result.message;
     this.feedbackType = result.success ? 'success' : 'error';
+  }
+
+  private matchesLaunchFilters(launch: FinanceLaunch): boolean {
+    const filters = this.filterForm.getRawValue();
+
+    if (filters.category && launch.category !== filters.category) {
+      return false;
+    }
+
+    if (filters.accountId && launch.accountId !== filters.accountId) {
+      return false;
+    }
+
+    if (filters.cardId && launch.cardId !== filters.cardId) {
+      return false;
+    }
+
+    if (filters.paymentMethod === 'income') {
+      return launch.type === 'income';
+    }
+
+    if (filters.paymentMethod && launch.paymentMethod !== filters.paymentMethod) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private matchesExpenseFilters(expense: Expense): boolean {
+    const filters = this.filterForm.getRawValue();
+
+    if (filters.category && expense.category !== filters.category) {
+      return false;
+    }
+
+    if (filters.accountId && expense.accountId !== filters.accountId) {
+      return false;
+    }
+
+    if (filters.cardId && expense.cardId !== filters.cardId) {
+      return false;
+    }
+
+    if (filters.paymentMethod === 'income') {
+      return false;
+    }
+
+    if (filters.paymentMethod && expense.paymentMethod !== filters.paymentMethod) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private matchesIncomeFilters(income: Income): boolean {
+    const filters = this.filterForm.getRawValue();
+
+    if (filters.category && income.category !== filters.category) {
+      return false;
+    }
+
+    if (filters.accountId && income.accountId !== filters.accountId) {
+      return false;
+    }
+
+    if (filters.cardId) {
+      return false;
+    }
+
+    if (filters.paymentMethod && filters.paymentMethod !== 'income') {
+      return false;
+    }
+
+    return true;
   }
 
   private readIncomeForm(): Omit<Income, 'id'> {

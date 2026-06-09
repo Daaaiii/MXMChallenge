@@ -293,6 +293,22 @@ a:hover {
   color: #ffffff;
 }
 
+.finance-filters {
+  margin-bottom: 18px;
+}
+
+.filter-heading {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.filter-heading h2 {
+  margin: 0;
+}
+
 .tab-panel,
 .form-stack,
 .list-stack,
@@ -315,10 +331,15 @@ a:hover {
 }
 
 .two-columns,
+.four-columns,
 .three-columns {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.four-columns {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .three-columns {
@@ -501,6 +522,7 @@ a:hover {
   .dashboard-summary,
   .dashboard-grid,
   .three-columns,
+  .four-columns,
   .two-columns,
   .list-item {
     display: grid;

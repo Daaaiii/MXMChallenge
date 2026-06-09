@@ -131,6 +131,30 @@ describe('FinanceService', () => {
     expect(service.getState().cards[0].name).toBe('Black');
   });
 
+  it('adds and increments sync metadata when records are created and updated', () => {
+    service.addIncome({
+      description: 'Pagamento',
+      category: 'Pagamento',
+      amount: 1000,
+      date: '2026-01-05',
+      recurring: false,
+      active: true,
+    });
+
+    const income = service.getState().incomes[0];
+    expect(income.createdAt).toBeTruthy();
+    expect(income.updatedAt).toBeTruthy();
+    expect(income.version).toBe(1);
+
+    service.updateIncome(income.id, { ...income, amount: 1200 });
+
+    const updatedIncome = service.getState().incomes[0];
+    expect(updatedIncome.createdAt).toBe(income.createdAt);
+    expect(updatedIncome.updatedAt).toBeTruthy();
+    expect(updatedIncome.version).toBe(2);
+    expect(updatedIncome.amount).toBe(1200);
+  });
+
   it('adds goal contributions and marks the goal as completed', () => {
     service.addGoal({
       name: 'Reserva',
@@ -172,6 +196,54 @@ describe('FinanceService', () => {
     expect(launches.length).toBe(2);
     expect(launches.some((launch) => launch.type === 'income')).toBeTrue();
     expect(launches.some((launch) => launch.type === 'expense')).toBeTrue();
+  });
+
+  it('adds account, method and card metadata to monthly launches', () => {
+    service.addAccount({
+      bankName: 'Banco Teste',
+      accountName: 'Principal',
+      accountType: 'Conta corrente',
+      initialBalance: 0,
+    });
+    service.addCard({ name: 'Principal', limit: 3000, closingDay: 1, dueDay: 10 });
+    const account = service.getState().accounts[0];
+    const card = service.getState().cards[0];
+
+    service.addIncome({
+      description: 'Pagamento',
+      category: 'Pagamento',
+      amount: 1200,
+      date: '2026-02-05',
+      recurring: false,
+      active: true,
+      accountId: account.id,
+    });
+    service.addExpense({
+      description: 'Mercado',
+      category: 'Outros',
+      amount: 300,
+      date: '2026-02-10',
+      paymentMethod: 'pix',
+      accountId: account.id,
+      installments: 1,
+    });
+    service.addExpense({
+      description: 'Notebook',
+      category: 'Outros',
+      amount: 1000,
+      date: '2026-02-12',
+      paymentMethod: 'credit-card',
+      cardId: card.id,
+      installments: 1,
+    });
+
+    const launches = service.getMonthlyLaunches('2026-02');
+
+    expect(launches.find((launch) => launch.type === 'income')?.accountId).toBe(account.id);
+    expect(launches.find((launch) => launch.type === 'expense')?.paymentMethod).toBe('pix');
+    expect(launches.find((launch) => launch.type === 'expense')?.accountId).toBe(account.id);
+    expect(launches.find((launch) => launch.type === 'card-installment')?.paymentMethod).toBe('credit-card');
+    expect(launches.find((launch) => launch.type === 'card-installment')?.cardId).toBe(card.id);
   });
 
   it('stores accounts, income destination and investments', () => {

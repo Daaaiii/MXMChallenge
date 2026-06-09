@@ -270,6 +270,67 @@ describe('FinanceComponent', () => {
     expect(component.monthlyBalance().income).toBe(0);
   });
 
+  it('filters launches and expenses by payment method, account and card', () => {
+    component.accountForm.patchValue({
+      bankName: 'Banco Teste',
+      accountName: 'Principal',
+      accountType: 'Conta corrente',
+      initialBalance: 0,
+    });
+    component.saveAccount();
+    component.cardForm.patchValue({ name: 'Cartao Teste', limit: 2000, closingDay: 1, dueDay: 10 });
+    component.saveCard();
+    const account = component.state.accounts[0];
+    const card = component.state.cards[0];
+
+    component.incomeForm.patchValue({
+      description: 'Pagamento',
+      category: 'Pagamento',
+      amount: 1000,
+      date: '2026-05-05',
+      recurring: false,
+      accountId: account.id,
+    });
+    component.saveIncome();
+
+    component.expenseForm.patchValue({
+      description: 'Mercado',
+      category: 'Outros',
+      amount: 150,
+      date: '2026-05-10',
+      paymentSource: `pix:${account.id}`,
+      installments: 1,
+    });
+    component.onPaymentMethodChange();
+    component.saveExpense();
+
+    component.expenseForm.patchValue({
+      description: 'Notebook',
+      category: 'Outros',
+      amount: 900,
+      date: '2026-05-12',
+      paymentSource: `card:${card.id}`,
+      installments: 3,
+    });
+    component.onPaymentMethodChange();
+    component.saveExpense();
+    component.selectedMonth = '2026-05';
+
+    component.filterForm.patchValue({ paymentMethod: 'pix' });
+    expect(component.filteredMonthlyLaunches().length).toBe(1);
+    expect(component.filteredMonthlyLaunches()[0].description).toBe('Mercado');
+
+    component.clearFilters();
+    component.filterForm.patchValue({ cardId: card.id });
+    expect(component.filteredCardExpenses().length).toBe(1);
+    expect(component.filteredMonthlyExpenses().length).toBe(0);
+
+    component.clearFilters();
+    component.filterForm.patchValue({ accountId: account.id });
+    expect(component.filteredMonthlyIncomes().length).toBe(1);
+    expect(component.filteredMonthlyExpenses().length).toBe(1);
+  });
+
   it('deletes a launch only after confirmation and shows success feedback', () => {
     spyOn(window, 'confirm').and.returnValue(true);
     component.incomeForm.patchValue({

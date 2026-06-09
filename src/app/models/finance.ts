@@ -20,7 +20,14 @@ export type InvestmentIndexer = 'CDI' | 'IPCA' | 'Prefixado' | 'Selic' | 'Outro'
 
 export type InvestmentLiquidity = 'Diaria' | 'No vencimento' | 'Sem liquidez' | 'Outro';
 
-export interface BankAccount {
+export interface FinanceSyncMetadata {
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  version?: number;
+}
+
+export interface BankAccount extends FinanceSyncMetadata {
   id: string;
   bankName: string;
   accountName: string;
@@ -28,7 +35,7 @@ export interface BankAccount {
   initialBalance: number;
 }
 
-export interface Income {
+export interface Income extends FinanceSyncMetadata {
   id: string;
   description: string;
   amount: number;
@@ -39,7 +46,7 @@ export interface Income {
   accountId?: string;
 }
 
-export interface Expense {
+export interface Expense extends FinanceSyncMetadata {
   id: string;
   description: string;
   category: FinanceCategory;
@@ -52,7 +59,7 @@ export interface Expense {
   notes?: string;
 }
 
-export interface CreditCard {
+export interface CreditCard extends FinanceSyncMetadata {
   id: string;
   name: string;
   limit: number;
@@ -60,7 +67,7 @@ export interface CreditCard {
   dueDay: number;
 }
 
-export interface GoalContribution {
+export interface GoalContribution extends FinanceSyncMetadata {
   id: string;
   amount: number;
   date: string;
@@ -68,7 +75,7 @@ export interface GoalContribution {
   notes?: string;
 }
 
-export interface FinanceGoal {
+export interface FinanceGoal extends FinanceSyncMetadata {
   id: string;
   name: string;
   targetAmount: number;
@@ -79,7 +86,7 @@ export interface FinanceGoal {
   completed: boolean;
 }
 
-export interface Investment {
+export interface Investment extends FinanceSyncMetadata {
   id: string;
   name: string;
   type: InvestmentType;
@@ -139,6 +146,9 @@ export interface FinanceLaunch {
   date: string;
   paymentLabel: string;
   amount: number;
+  paymentMethod?: PaymentMethod;
+  accountId?: string;
+  cardId?: string;
 }
 
 export interface MonthlySummary {

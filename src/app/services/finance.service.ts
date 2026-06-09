@@ -9,20 +9,20 @@ import {
   FinanceGoal,
   FinanceLaunch,
   FinanceState,
+  FinanceSyncMetadata,
   GoalContribution,
   Income,
   Investment,
   InvestmentGroup,
   InvestmentRedemptionRequest,
   InvestmentSummary,
-  LegacyFinanceEntry,
   MonthlyBalance,
   MonthlyInstallment,
   MonthlySummary,
   NetWorthSummary,
 } from '../models/finance';
-import { BrowserStorageService } from './browser-storage.service';
 import { AuthService } from './auth.service';
+import { LocalFinanceRepository } from './local-finance.repository';
 
 const DEFAULT_STATE: FinanceState = {
   incomes: [],
@@ -37,13 +37,15 @@ const DEFAULT_STATE: FinanceState = {
   providedIn: 'root',
 })
 export class FinanceService {
-  private readonly stateSubject = new BehaviorSubject<FinanceState>(this.loadState());
+  private readonly stateSubject = new BehaviorSubject<FinanceState>(DEFAULT_STATE);
   readonly state$ = this.stateSubject.asObservable();
 
   constructor(
-    private storage: BrowserStorageService,
+    private financeRepository: LocalFinanceRepository,
     private authService: AuthService
-  ) {}
+  ) {
+    this.loadState();
+  }
 
   getState(): FinanceState {
     return this.stateSubject.getValue();
@@ -51,14 +53,14 @@ export class FinanceService {
 
   addIncome(income: Omit<Income, 'id'>): void {
     const state = this.getState();
-    this.saveState({ ...state, incomes: [{ ...income, id: createId() }, ...state.incomes] });
+    this.saveState({ ...state, incomes: [createTrackedEntity(income), ...state.incomes] });
   }
 
   updateIncome(incomeId: string, income: Omit<Income, 'id'>): void {
     const state = this.getState();
     this.saveState({
       ...state,
-      incomes: state.incomes.map((item) => (item.id === incomeId ? { ...income, id: incomeId } : item)),
+      incomes: state.incomes.map((item) => (item.id === incomeId ? updateTrackedEntity(item, income) : item)),
     });
   }
 
@@ -73,14 +75,14 @@ export class FinanceService {
 
   addAccount(account: Omit<BankAccount, 'id'>): void {
     const state = this.getState();
-    this.saveState({ ...state, accounts: [{ ...account, id: createId() }, ...state.accounts] });
+    this.saveState({ ...state, accounts: [createTrackedEntity(account), ...state.accounts] });
   }
 
   updateAccount(accountId: string, account: Omit<BankAccount, 'id'>): void {
     const state = this.getState();
     this.saveState({
       ...state,
-      accounts: state.accounts.map((item) => (item.id === accountId ? { ...account, id: accountId } : item)),
+      accounts: state.accounts.map((item) => (item.id === accountId ? updateTrackedEntity(item, account) : item)),
     });
   }
 
@@ -106,7 +108,7 @@ export class FinanceService {
 
   addInvestment(investment: Omit<Investment, 'id'>): void {
     const state = this.getState();
-    this.saveState({ ...state, investments: [{ ...investment, id: createId() }, ...state.investments] });
+    this.saveState({ ...state, investments: [createTrackedEntity(investment), ...state.investments] });
   }
 
   updateInvestment(investmentId: string, investment: Omit<Investment, 'id'>): void {
@@ -114,7 +116,7 @@ export class FinanceService {
     this.saveState({
       ...state,
       investments: state.investments.map((item) =>
-        item.id === investmentId ? { ...investment, id: investmentId } : item
+        item.id === investmentId ? updateTrackedEntity(item, investment) : item
       ),
     });
   }
@@ -160,8 +162,7 @@ export class FinanceService {
     const description = `Resgate - ${investment.name}`;
     const notes = redemption.notes || undefined;
     const shouldTransferBetweenAccounts = !!investment.accountId && investment.accountId !== redemption.accountId;
-    const income: Income = {
-      id: createId(),
+    const income: Income = createTrackedEntity({
       description,
       category: 'Outros',
       amount,
@@ -169,19 +170,18 @@ export class FinanceService {
       recurring: false,
       active: true,
       accountId: redemption.accountId,
-    };
+    });
     const transferExpense: Expense | undefined = shouldTransferBetweenAccounts
-      ? {
-          id: createId(),
+      ? createTrackedEntity({
           description: `Transferencia de resgate - ${investment.name}`,
-          category: 'Outros',
+          category: 'Outros' as const,
           amount,
           date,
-          paymentMethod: 'pix',
+          paymentMethod: 'pix' as const,
           accountId: investment.accountId,
           installments: 1,
           notes,
-        }
+        })
       : undefined;
 
     this.saveState({
@@ -193,12 +193,11 @@ export class FinanceService {
           ? state.investments.filter((item) => item.id !== investment.id)
           : state.investments.map((item) =>
               item.id === investment.id
-                ? {
-                    ...item,
+                ? updateTrackedEntity(item, {
                     currentAmount: remainingCurrent,
                     investedAmount: remainingInvested,
                     notes: appendInvestmentNote(item.notes, `Resgate de ${toCurrency(amount)} em ${date}${notes ? ` - ${notes}` : ''}`),
-                  }
+                  })
                 : item
             ),
     });
@@ -208,14 +207,14 @@ export class FinanceService {
 
   addExpense(expense: Omit<Expense, 'id'>): void {
     const state = this.getState();
-    this.saveState({ ...state, expenses: [{ ...expense, id: createId() }, ...state.expenses] });
+    this.saveState({ ...state, expenses: [createTrackedEntity(expense), ...state.expenses] });
   }
 
   updateExpense(expenseId: string, expense: Omit<Expense, 'id'>): void {
     const state = this.getState();
     this.saveState({
       ...state,
-      expenses: state.expenses.map((item) => (item.id === expenseId ? { ...expense, id: expenseId } : item)),
+      expenses: state.expenses.map((item) => (item.id === expenseId ? updateTrackedEntity(item, expense) : item)),
     });
   }
 
@@ -230,14 +229,14 @@ export class FinanceService {
 
   addCard(card: Omit<CreditCard, 'id'>): void {
     const state = this.getState();
-    this.saveState({ ...state, cards: [{ ...card, id: createId() }, ...state.cards] });
+    this.saveState({ ...state, cards: [createTrackedEntity(card), ...state.cards] });
   }
 
   updateCard(cardId: string, card: Omit<CreditCard, 'id'>): void {
     const state = this.getState();
     this.saveState({
       ...state,
-      cards: state.cards.map((item) => (item.id === cardId ? { ...card, id: cardId } : item)),
+      cards: state.cards.map((item) => (item.id === cardId ? updateTrackedEntity(item, card) : item)),
     });
   }
 
@@ -260,20 +259,19 @@ export class FinanceService {
     const currentAmount = Number(goal.currentAmount || 0);
     const targetAmount = Number(goal.targetAmount || 0);
     const initialContribution: GoalContribution[] =
-      currentAmount > 0 ? [{ id: createId(), amount: currentAmount, date: new Date().toISOString().slice(0, 10) }] : [];
+      currentAmount > 0 ? [createTrackedEntity({ amount: currentAmount, date: new Date().toISOString().slice(0, 10) })] : [];
     const state = this.getState();
 
     this.saveState({
       ...state,
       goals: [
-        {
+        createTrackedEntity({
           ...goal,
-          id: createId(),
           currentAmount,
           targetAmount,
           contributions: initialContribution,
           completed: currentAmount >= targetAmount,
-        },
+        }),
         ...state.goals,
       ],
     });
@@ -290,8 +288,7 @@ export class FinanceService {
 
         const currentAmount = getGoalCurrentAmount(goal.contributions);
         return {
-          ...goal,
-          id: goalId,
+          ...updateTrackedEntity(item, goal),
           currentAmount,
           completed: currentAmount >= goal.targetAmount,
         };
@@ -323,9 +320,9 @@ export class FinanceService {
           return goal;
         }
 
-        const contributions = [{ ...contribution, id: createId() }, ...goal.contributions];
+        const contributions = [createTrackedEntity(contribution), ...goal.contributions];
         const currentAmount = getGoalCurrentAmount(contributions);
-        return { ...goal, contributions, currentAmount, completed: currentAmount >= goal.targetAmount };
+        return updateTrackedEntity(goal, { contributions, currentAmount, completed: currentAmount >= goal.targetAmount });
       }),
     });
   }
@@ -345,7 +342,7 @@ export class FinanceService {
       ...state,
       goals: state.goals.map((item) =>
         item.id === goalId
-          ? { ...item, contributions, currentAmount, completed: currentAmount >= item.targetAmount }
+          ? updateTrackedEntity(item, { contributions, currentAmount, completed: currentAmount >= item.targetAmount })
           : item
       ),
     });
@@ -383,6 +380,7 @@ export class FinanceService {
       date: income.recurring ? `${month}-${income.date.slice(8, 10)}` : income.date,
       paymentLabel: income.recurring ? 'Receita recorrente' : 'Receita avulsa',
       amount: income.amount,
+      accountId: income.accountId,
     }));
     const directExpenses = state.expenses
       .filter((expense) => expense.paymentMethod !== 'credit-card' && expense.date.slice(0, 7) === month)
@@ -394,6 +392,8 @@ export class FinanceService {
         date: expense.date,
         paymentLabel: getExpensePaymentLabel(expense, state),
         amount: -expense.amount,
+        paymentMethod: expense.paymentMethod,
+        accountId: expense.accountId,
       }));
     const installments = this.getInstallments(state.expenses, state.cards)
       .filter((installment) => installment.month === month)
@@ -405,6 +405,8 @@ export class FinanceService {
         date: installment.purchaseDate,
         paymentLabel: `${installment.cardName} ${installment.installmentNumber}/${installment.installments}`,
         amount: -installment.amount,
+        paymentMethod: 'credit-card' as const,
+        cardId: installment.cardId,
       }));
 
     return [...incomes, ...directExpenses, ...installments].sort((a, b) => b.date.localeCompare(a.date));
@@ -633,21 +635,15 @@ export class FinanceService {
   }
 
   private saveState(state: FinanceState): void {
-    this.storage.setItem(this.storageKey, JSON.stringify(state));
-    this.stateSubject.next(state);
+    this.financeRepository.save(this.storageKey, state).subscribe((savedState) => {
+      this.stateSubject.next(savedState);
+    });
   }
 
-  private loadState(): FinanceState {
-    const rawState = this.storage.getItem(this.storageKey);
-    if (!rawState) {
-      return DEFAULT_STATE;
-    }
-
-    try {
-      return normalizeState(JSON.parse(rawState));
-    } catch {
-      return DEFAULT_STATE;
-    }
+  private loadState(): void {
+    this.financeRepository.load(this.storageKey).subscribe((state) => {
+      this.stateSubject.next(state);
+    });
   }
 
   private get storageKey(): string {
@@ -661,55 +657,6 @@ export function toCurrency(value: number): string {
     style: 'currency',
     currency: 'BRL',
   }).format(value);
-}
-
-function normalizeState(value: Partial<FinanceState> & { entries?: LegacyFinanceEntry[] }): FinanceState {
-  if (Array.isArray(value.entries) && !Array.isArray(value.expenses)) {
-    return {
-      incomes: [],
-      expenses: value.entries.map((entry) => ({
-        id: entry.id,
-        description: entry.description,
-        category: entry.category,
-        amount: entry.amount,
-        date: entry.date,
-        paymentMethod: entry.type === 'card-purchase' ? 'credit-card' : 'cash',
-        accountId: entry.accountId,
-        cardId: entry.cardId,
-        installments: entry.installments || 1,
-      })),
-      cards: value.cards || [],
-      goals: normalizeGoals(value.goals || []),
-      accounts: value.accounts || [],
-      investments: value.investments || [],
-    };
-  }
-
-  return {
-    incomes: value.incomes || [],
-    expenses: value.expenses || [],
-    cards: value.cards || [],
-    goals: normalizeGoals(value.goals || []),
-    accounts: value.accounts || [],
-    investments: value.investments || [],
-  };
-}
-
-function normalizeGoals(goals: Array<Partial<FinanceGoal> & { id: string; name: string; deadline: string }>): FinanceGoal[] {
-  return goals.map((goal) => {
-    const contributions = goal.contributions || [];
-    const currentAmount = contributions.length ? getGoalCurrentAmount(contributions) : Number(goal.currentAmount || 0);
-    return {
-      id: goal.id,
-      name: goal.name,
-      targetAmount: Number(goal.targetAmount || 0),
-      currentAmount,
-      deadline: goal.deadline,
-      accountId: goal.accountId,
-      contributions,
-      completed: goal.completed ?? currentAmount >= Number(goal.targetAmount || 0),
-    };
-  });
 }
 
 function getGoalCurrentAmount(contributions: GoalContribution[]): number {
@@ -797,6 +744,29 @@ function blockedResult(message: string): FinanceDeleteResult {
 
 function appendInvestmentNote(currentNotes: string | undefined, note: string): string {
   return currentNotes ? `${currentNotes}\n${note}` : note;
+}
+
+function createTrackedEntity<T extends object>(entity: T): T & FinanceSyncMetadata & { id: string } {
+  const timestamp = new Date().toISOString();
+
+  return {
+    ...entity,
+    id: createId(),
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    version: 1,
+  };
+}
+
+function updateTrackedEntity<T extends FinanceSyncMetadata & { id: string }, U extends object>(current: T, changes: U): T & U {
+  return {
+    ...current,
+    ...changes,
+    id: current.id,
+    createdAt: current.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    version: Number(current.version || 1) + 1,
+  };
 }
 
 function createId(): string {
