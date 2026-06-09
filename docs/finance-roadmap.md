@@ -205,6 +205,8 @@ Documento da fase aprovada: [finance-phase-4.md](finance-phase-4.md).
 
 Melhorar usabilidade para uso real com listas maiores.
 
+Documento da fase aprovada: [finance-phase-5.md](finance-phase-5.md).
+
 ### Plano
 
 - Adicionar filtros por:
@@ -245,6 +247,8 @@ Melhorar usabilidade para uso real com listas maiores.
 
 Preparar o modulo para sincronizacao real por usuario fora do `localStorage`.
 
+Documento da fase aprovada: [finance-phase-6.md](finance-phase-6.md).
+
 ### Plano
 
 - Criar camada `FinanceRepository`.
@@ -273,6 +277,8 @@ Preparar o modulo para sincronizacao real por usuario fora do `localStorage`.
 
 ## Proxima Fase Recomendada
 
-A proxima fase recomendada e a **Fase 5: UX, Filtros e Organizacao**.
+A trilha aprovada do roadmap financeiro foi concluida ate a **Fase 6: Persistencia com Backend**.
 
-Ela deve ser implementada somente apos aprovacao explicita.
+A proxima etapa recomendada foi documentada em [finance-backend-integration-plan.md](finance-backend-integration-plan.md).
+
+Ela cobre endpoints, autenticacao, migracao dos dados locais, sincronizacao entre dispositivos e conflitos. A primeira etapa tecnica sugerida e **Preparar Contrato Assincrono**, mas ela deve ser aprovada separadamente antes de qualquer alteracao funcional.
