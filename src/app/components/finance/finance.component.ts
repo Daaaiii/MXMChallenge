@@ -22,6 +22,7 @@ import {
   PaymentMethod,
 } from '../../models/finance';
 import { FinanceService, toCurrency } from '../../services/finance.service';
+import { FinanceSyncStatusService, FinanceSyncStatusState } from '../../services/finance-sync-status.service';
 import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 type FinanceTab =
@@ -72,6 +73,7 @@ export class FinanceComponent implements OnInit {
   activeTab: FinanceTab = 'dashboard';
   selectedMonth = new Date().toISOString().slice(0, 7);
   state: FinanceState = this.financeService.getState();
+  syncStatus: FinanceSyncStatusState = this.financeSyncStatus.snapshot();
   editingIncomeId = '';
   editingExpenseId = '';
   editingCardId = '';
@@ -164,10 +166,15 @@ export class FinanceComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private financeService: FinanceService,
+    private financeSyncStatus: FinanceSyncStatusService,
     private feedbackModal: FeedbackModalService
   ) {}
 
   ngOnInit(): void {
+    this.financeSyncStatus.status$.subscribe((status) => {
+      this.syncStatus = status;
+    });
+
     this.financeService.state$.subscribe((state) => {
       this.state = state;
       if (!this.contributionForm.get('goalId')?.value && state.goals.length) {

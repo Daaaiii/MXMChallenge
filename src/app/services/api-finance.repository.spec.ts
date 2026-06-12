@@ -7,6 +7,7 @@ import { FinanceState } from '../models/finance';
 import { ApiFinanceRepository } from './api-finance.repository';
 import { AuthService } from './auth.service';
 import { BrowserStorageService } from './browser-storage.service';
+import { FinanceSyncStatusService } from './finance-sync-status.service';
 import { LocalFinanceRepository } from './local-finance.repository';
 
 describe('ApiFinanceRepository', () => {
@@ -23,6 +24,7 @@ describe('ApiFinanceRepository', () => {
   let httpMock: HttpTestingController;
   let authService: jasmine.SpyObj<AuthService>;
   let storage: jasmine.SpyObj<BrowserStorageService>;
+  let syncStatus: FinanceSyncStatusService;
   let localRepository: jasmine.SpyObj<LocalFinanceRepository>;
 
   beforeEach(() => {
@@ -46,6 +48,7 @@ describe('ApiFinanceRepository', () => {
 
     repository = TestBed.inject(ApiFinanceRepository);
     httpMock = TestBed.inject(HttpTestingController);
+    syncStatus = TestBed.inject(FinanceSyncStatusService);
   });
 
   afterEach(() => {
@@ -85,6 +88,7 @@ describe('ApiFinanceRepository', () => {
     expect(result).toBe(remoteState);
     expect(localRepository.save).toHaveBeenCalledWith('FinanceState:User', remoteState);
     expect(storage.setItem).toHaveBeenCalledWith('FinanceState:User:ServerVersion', '1');
+    expect(syncStatus.snapshot().status).toBe('synced');
   });
 
   it('loads local state when remote state does not exist and local state is empty', async () => {
@@ -225,6 +229,7 @@ describe('ApiFinanceRepository', () => {
 
     expect(result).toBe(emptyState);
     expect(localRepository.save).toHaveBeenCalledWith('FinanceState:User', emptyState);
+    expect(syncStatus.snapshot().status).toBe('offline');
     httpMock.expectNone(`${environment.apiUrl}/api/finance/state`);
   });
 
@@ -240,5 +245,6 @@ describe('ApiFinanceRepository', () => {
 
     expect(result).toBe(emptyState);
     expect(localRepository.load).toHaveBeenCalledWith('FinanceState:User');
+    expect(syncStatus.snapshot().status).toBe('error');
   });
 });

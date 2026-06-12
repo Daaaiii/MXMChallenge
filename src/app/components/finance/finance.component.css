@@ -1,1 +1,79 @@
+.finance-heading {
+  align-items: center;
+  gap: 1rem;
+}
 
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 12rem;
+  max-width: 18rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d5dbe3;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #263241;
+  line-height: 1.2;
+}
+
+.sync-status strong,
+.sync-status span {
+  display: block;
+}
+
+.sync-status strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.sync-status span {
+  font-size: 0.75rem;
+}
+
+.sync-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  flex: 0 0 0.625rem;
+  border-radius: 999px;
+  background: #6b7280;
+}
+
+.sync-status-active {
+  border-color: #6aa2ff;
+}
+
+.sync-status-active .sync-dot {
+  background: #2563eb;
+}
+
+.sync-status-ok {
+  border-color: #72c69f;
+}
+
+.sync-status-ok .sync-dot {
+  background: #16865a;
+}
+
+.sync-status-warning {
+  border-color: #e2b75a;
+}
+
+.sync-status-warning .sync-dot {
+  background: #a66a00;
+}
+
+.sync-status-error {
+  border-color: #ec8f8f;
+}
+
+.sync-status-error .sync-dot {
+  background: #c62828;
+}
+
+@media (max-width: 760px) {
+  .sync-status {
+    width: 100%;
+    max-width: none;
+  }
+}

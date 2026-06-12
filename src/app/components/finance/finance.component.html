@@ -7,6 +7,13 @@
         <h1>Controle financeiro</h1>
         <p>Organize entradas, saídas, contas, cartões, investimentos, faturas e metas.</p>
       </div>
+      <div class="sync-status" [class.sync-status-active]="syncStatus.status === 'checking' || syncStatus.status === 'syncing'" [class.sync-status-ok]="syncStatus.status === 'synced'" [class.sync-status-warning]="syncStatus.status === 'offline'" [class.sync-status-error]="syncStatus.status === 'error'">
+        <span class="sync-dot" aria-hidden="true"></span>
+        <div>
+          <strong>{{ syncStatus.label }}</strong>
+          <span>{{ syncStatus.detail }}</span>
+        </div>
+      </div>
       <label class="month-picker">
         Mês de referência
         <input class="form-control" type="month" [value]="selectedMonth" (change)="onMonthChange($event)" />

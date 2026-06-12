@@ -6,6 +6,7 @@ import { FinanceState } from '../models/finance';
 import { AuthService } from './auth.service';
 import { BrowserStorageService } from './browser-storage.service';
 import { FinanceRepository, FinanceStateResponse, FinanceSyncResponse } from './finance.repository';
+import { FinanceSyncStatusService } from './finance-sync-status.service';
 import { LocalFinanceRepository } from './local-finance.repository';
 
 @Injectable({
@@ -19,19 +20,26 @@ export class ApiFinanceRepository implements FinanceRepository {
     private http: HttpClient,
     private authService: AuthService,
     private storage: BrowserStorageService,
+    private syncStatus: FinanceSyncStatusService,
     private localRepository: LocalFinanceRepository
   ) {}
 
   load(userKey: string): Observable<FinanceState> {
     if (!this.canUseApi()) {
+      this.syncStatus.setOffline();
       return this.localRepository.load(userKey);
     }
+
+    this.syncStatus.setChecking();
 
     return this.localRepository.load(userKey).pipe(
       switchMap((localState) =>
         this.http.get<FinanceStateResponse>(this.stateUrl).pipe(
           switchMap((response) => this.resolveInitialState(userKey, localState, response)),
-          catchError(() => of(localState))
+          catchError(() => {
+            this.syncStatus.setError();
+            return of(localState);
+          })
         )
       )
     );
@@ -39,13 +47,22 @@ export class ApiFinanceRepository implements FinanceRepository {
 
   save(userKey: string, state: FinanceState): Observable<FinanceState> {
     if (!this.canUseApi()) {
+      this.syncStatus.setOffline();
       return this.localRepository.save(userKey, state);
     }
 
+    this.syncStatus.setSyncing();
+
     return this.http.put<FinanceStateResponse>(this.stateUrl, state).pipe(
-      tap((response) => this.storeServerVersion(userKey, response.serverVersion)),
+      tap((response) => {
+        this.storeServerVersion(userKey, response.serverVersion);
+        this.syncStatus.setSynced();
+      }),
       switchMap((response) => this.localRepository.save(userKey, response.state)),
-      catchError(() => this.localRepository.save(userKey, state))
+      catchError(() => {
+        this.syncStatus.setError();
+        return this.localRepository.save(userKey, state);
+      })
     );
   }
 
@@ -64,6 +81,7 @@ export class ApiFinanceRepository implements FinanceRepository {
 
     if (!hasLocalState) {
       this.storeServerVersion(userKey, response.serverVersion);
+      this.syncStatus.setSynced();
       return this.localRepository.save(userKey, response.state);
     }
 
@@ -71,13 +89,18 @@ export class ApiFinanceRepository implements FinanceRepository {
   }
 
   private sync(userKey: string, localState: FinanceState): Observable<FinanceState> {
+    this.syncStatus.setSyncing();
+
     return this.http
       .post<FinanceSyncResponse>(this.syncUrl, {
         baseVersion: this.getServerVersion(userKey),
         localState,
       })
       .pipe(
-        tap((response) => this.storeServerVersion(userKey, response.serverVersion)),
+        tap((response) => {
+          this.storeServerVersion(userKey, response.serverVersion);
+          this.syncStatus.setSynced(response.conflicts.length);
+        }),
         switchMap((response) => this.localRepository.save(userKey, response.state))
       );
   }
