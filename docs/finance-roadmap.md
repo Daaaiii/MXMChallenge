@@ -31,6 +31,7 @@ Ao final de fases funcionais no backend:
 ```bash
 dotnet restore
 dotnet build
+dotnet test
 dotnet ef database update
 ```
 
@@ -87,6 +88,7 @@ dotnet ef database update
   - `POST /api/finance/sync`
 - Docker Compose com API + SQL Server.
 - JWT ajustado para claims `sub`, `nameidentifier`, `id` e `email`.
+- Testes automatizados para regras de merge e isolamento por usuario nos endpoints financeiros.
 
 ### Frontend
 
@@ -107,6 +109,7 @@ Backend:
 - `dotnet ef database update` aplicado no SQL Server em Docker.
 - `GET /api/health` retornou banco acessivel.
 - Snapshot e sync autenticados foram testados manualmente.
+- `dotnet test MxmChallenge.sln --no-restore` passou com 10 testes.
 
 Frontend:
 
@@ -115,8 +118,8 @@ Frontend:
 
 ## Proximas Fases Recomendadas
 
-1. Criar testes automatizados no backend para merge e isolamento por usuario.
-2. Validar o fluxo completo frontend + backend com API e Angular rodando juntos.
+1. Validar o fluxo completo frontend + backend com API e Angular rodando juntos.
+2. Planejar testes de integracao HTTP com `WebApplicationFactory` quando a dependencia `Microsoft.AspNetCore.Mvc.Testing` estiver disponivel.
 3. Planejar CRUD granular apenas se houver necessidade real de performance, auditoria ou edicao colaborativa mais fina.
 
 ## Documentos Relacionados
