@@ -96,6 +96,8 @@ dotnet ef database update
 - Migracao local para remoto quando o remoto nao existe.
 - Sync quando local e remoto existem.
 - `serverVersion` salvo em `FinanceState:{usuario}:ServerVersion`.
+- Indicador visual de sincronizacao na tela financeira.
+- Painel de conflitos quando o backend retorna `conflicts`.
 
 ## Validacoes Recentes
 
@@ -113,10 +115,9 @@ Frontend:
 
 ## Proximas Fases Recomendadas
 
-1. Adicionar indicador visual de sincronizacao na tela financeira.
-2. Exibir conflitos de sync quando o backend retornar `conflicts`.
-3. Criar testes automatizados no backend para merge e isolamento por usuario.
-4. Planejar CRUD granular apenas se houver necessidade real de performance, auditoria ou edicao colaborativa mais fina.
+1. Criar testes automatizados no backend para merge e isolamento por usuario.
+2. Validar o fluxo completo frontend + backend com API e Angular rodando juntos.
+3. Planejar CRUD granular apenas se houver necessidade real de performance, auditoria ou edicao colaborativa mais fina.
 
 ## Documentos Relacionados
 
