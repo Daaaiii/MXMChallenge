@@ -191,7 +191,16 @@ describe('ApiFinanceRepository', () => {
       source: 'merged',
       serverVersion: 5,
       state: localState,
-      conflicts: [],
+      conflicts: [
+        {
+          entity: 'incomes',
+          entityId: 'income-1',
+          field: 'amount',
+          localValue: 1000,
+          remoteValue: 900,
+          createdAt: '2026-06-12T00:00:00Z',
+        },
+      ],
     });
 
     const result = await resultPromise;
@@ -199,6 +208,9 @@ describe('ApiFinanceRepository', () => {
     expect(result).toBe(localState);
     expect(localRepository.save).toHaveBeenCalledWith('FinanceState:User', localState);
     expect(storage.setItem).toHaveBeenCalledWith('FinanceState:User:ServerVersion', '5');
+    expect(syncStatus.snapshot().status).toBe('error');
+    expect(syncStatus.snapshot().conflictCount).toBe(1);
+    expect(syncStatus.snapshot().conflicts[0].field).toBe('amount');
   });
 
   it('saves remote state and mirrors the response locally when authenticated', async () => {

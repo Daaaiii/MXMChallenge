@@ -834,6 +834,19 @@ export class FinanceComponent implements OnInit {
     return labels[method];
   }
 
+  syncConflictLabel(entity: string): string {
+    const labels: Record<string, string> = {
+      incomes: 'Entrada',
+      expenses: 'Despesa',
+      cards: 'Cartao',
+      goals: 'Meta',
+      accounts: 'Conta',
+      investments: 'Investimento',
+    };
+
+    return labels[entity] || entity;
+  }
+
   expensePaymentLabel(expense: Expense): string {
     if (expense.paymentMethod === 'credit-card') {
       const card = this.state.cards.find((item) => item.id === expense.cardId);

@@ -71,6 +71,19 @@
   background: #c62828;
 }
 
+.sync-conflicts {
+  border-color: #ec8f8f;
+}
+
+.sync-conflicts h2 {
+  margin-bottom: 0.25rem;
+}
+
+.sync-conflicts p {
+  margin: 0 0 1rem;
+  color: #5f6b7a;
+}
+
 @media (max-width: 760px) {
   .sync-status {
     width: 100%;

@@ -99,7 +99,7 @@ export class ApiFinanceRepository implements FinanceRepository {
       .pipe(
         tap((response) => {
           this.storeServerVersion(userKey, response.serverVersion);
-          this.syncStatus.setSynced(response.conflicts.length);
+          this.syncStatus.setSynced(response.conflicts);
         }),
         switchMap((response) => this.localRepository.save(userKey, response.state))
       );

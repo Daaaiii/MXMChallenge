@@ -32,6 +32,23 @@
       <button type="button" [class.active]="activeTab === 'charts'" (click)="setTab('charts')">Gráficos</button>
     </nav>
 
+    @if (syncStatus.conflictCount > 0) {
+      <section class="finance-panel surface-card sync-conflicts">
+        <div>
+          <h2>Conflitos de sincronizacao</h2>
+          <p>Algumas alteracoes concorrentes foram mantidas com a versao remota. Revise os itens abaixo antes de continuar editando.</p>
+        </div>
+        <div class="list-stack">
+          @for (conflict of syncStatus.conflicts; track conflict.entity + conflict.entityId + conflict.field) {
+            <div class="list-item">
+              <strong>{{ syncConflictLabel(conflict.entity) }} - {{ conflict.field }}</strong>
+              <span>ID {{ conflict.entityId }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
     <section class="finance-panel surface-card finance-filters">
       <div class="filter-heading">
         <h2>Filtros</h2>
