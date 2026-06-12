@@ -110,16 +110,18 @@ Backend:
 - `GET /api/health` retornou banco acessivel.
 - Snapshot e sync autenticados foram testados manualmente.
 - `dotnet test MxmChallenge.sln --no-restore` passou com 10 testes.
+- Smoke test `scripts\validate-finance-e2e.ps1` validou cadastro, login, snapshot, sync e cleanup contra `http://localhost:8080`.
 
 Frontend:
 
 - `npm.cmd test -- --watch=false --browsers=ChromeHeadless` passou com 79 testes.
 - `npm.cmd run build` passou.
+- Angular dev server respondeu `200` em `http://127.0.0.1:4200`.
 
 ## Proximas Fases Recomendadas
 
-1. Validar o fluxo completo frontend + backend com API e Angular rodando juntos.
-2. Planejar testes de integracao HTTP com `WebApplicationFactory` quando a dependencia `Microsoft.AspNetCore.Mvc.Testing` estiver disponivel.
+1. Planejar testes de integracao HTTP com `WebApplicationFactory` quando a dependencia `Microsoft.AspNetCore.Mvc.Testing` estiver disponivel.
+2. Planejar automacao de navegador para login + `/finance` quando Playwright/Cypress estiver disponivel no frontend.
 3. Planejar CRUD granular apenas se houver necessidade real de performance, auditoria ou edicao colaborativa mais fina.
 
 ## Documentos Relacionados
