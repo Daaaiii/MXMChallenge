@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import {
   CreditCard,
@@ -22,7 +23,8 @@ import {
   NetWorthSummary,
 } from '../models/finance';
 import { AuthService } from './auth.service';
-import { LocalFinanceRepository } from './local-finance.repository';
+import { FinanceRepository } from './finance.repository';
+import { FINANCE_REPOSITORY } from './finance-repository.token';
 
 const DEFAULT_STATE: FinanceState = {
   incomes: [],
@@ -41,7 +43,7 @@ export class FinanceService {
   readonly state$ = this.stateSubject.asObservable();
 
   constructor(
-    private financeRepository: LocalFinanceRepository,
+    @Inject(FINANCE_REPOSITORY) private financeRepository: FinanceRepository,
     private authService: AuthService
   ) {
     this.loadState();

@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://testemxm.azurewebsites.net',
+  apiUrl: 'http://localhost:8080',
+  financeApiEnabled: true,
 };
