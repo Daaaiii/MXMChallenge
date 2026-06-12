@@ -2,283 +2,124 @@
 
 ## Visao Geral
 
-O modulo financeiro do MXMChallenge esta em modo local-first, persistindo dados no navegador por usuario autenticado. A tela `/finance` ja contempla dashboard, contas, entradas, despesas, cartoes, faturas, metas/reservas, investimentos e graficos.
+O modulo financeiro do MXMChallenge nasceu local-first e agora possui integracao real com backend. A tela `/finance` contempla dashboard, contas, entradas, despesas, cartoes, faturas, metas/reservas, investimentos e graficos.
 
-Este documento organiza a evolucao do modulo por fases. Cada fase deve ser aprovada separadamente antes da implementacao. Ao concluir uma fase, devem ser apresentados resumo, arquivos alterados, validacoes executadas e riscos restantes.
+Este documento registra a trilha de evolucao, o estado atual e as proximas fases recomendadas.
 
 ## Estado Atual
 
-- Persistencia local via `localStorage`, encapsulada pelo servico browser-safe.
-- Estado financeiro com `incomes`, `expenses`, `cards`, `goals`, `accounts` e `investments`.
-- Entradas com data, categoria, recorrencia e conta de destino opcional.
-- Despesas com dinheiro, Pix ou cartao; compras de cartao podem ser parceladas.
-- Cartoes com limite, fechamento, vencimento, fatura do mes e limite comprometido.
-- Metas/reservas com contribuicoes, progresso e conta vinculada.
-- Investimentos com tipo, instituicao, conta, valor aplicado, valor atual e datas.
-- Dashboard com mes de referencia, lancamentos, alertas e indicadores principais.
+- Frontend Angular com `FinanceService`, `FinanceRepository`, `LocalFinanceRepository` e `ApiFinanceRepository`.
+- Persistencia local browser-safe via `localStorage`.
+- Backend C# no projeto `D:\Projetos_pessoais\mxmBackend`, migrado para .NET 10.
+- API financeira protegida por JWT.
+- Persistencia remota por snapshot completo de `FinanceState`.
+- Sincronizacao via `POST /api/finance/sync`.
+- Fallback local quando nao ha token ou quando a API esta indisponivel.
+- Migracao inicial de dados locais para backend quando o usuario autenticado ainda nao tem snapshot remoto.
 
-## Regra de Execucao
+## Validacao Padrao
 
-- A implementacao deve seguir a ordem das fases.
-- Nenhuma fase futura deve ser executada sem aprovacao explicita.
-- Mudancas funcionais devem vir acompanhadas de testes focados.
-- Ao final de cada fase, rodar:
+Ao final de fases funcionais no frontend:
 
 ```bash
 npm.cmd run build
 npm.cmd test -- --watch=false --browsers=ChromeHeadless
 ```
 
-## Fase 1: Validacao e Base
+Ao final de fases funcionais no backend:
 
-### Objetivo
+```bash
+dotnet restore
+dotnet build
+dotnet ef database update
+```
 
-Estabilizar o modulo atual, salvar a documentacao do roadmap e garantir que build/testes estejam verdes antes de adicionar novas regras.
-
-### Plano
+## Fases Concluidas
 
-- Criar este documento em `docs/finance-roadmap.md`.
-- Atualizar o `README.md` com referencia para o roadmap.
-- Conferir o estado atual do modulo financeiro.
-- Corrigir textos/encoding se necessario em uma etapa aprovada.
-- Confirmar que o CSS financeiro nao dispara warning de budget por componente.
-
-### Testes e Validacao
+### Fase 1: Validacao e Base
 
-- Rodar build.
-- Rodar testes headless.
-- Fazer smoke test manual recomendado:
-  - login
-  - acessar `/finance`
-  - cadastrar conta
-  - cadastrar entrada com data e conta
-  - cadastrar cartao
-  - cadastrar compra parcelada
-  - cadastrar meta/reserva com conta
-  - adicionar valor a meta
-  - cadastrar investimento
-  - trocar mes de referencia
+- Roadmap salvo em `docs/finance-roadmap.md`.
+- Build e testes usados como criterio de aceite.
+- Funcionalidades financeiras existentes preservadas.
 
-### Criterios de Aceite
+### Fase 2: Exclusao e CRUD Completo
 
-- Roadmap salvo no projeto.
-- README aponta para o roadmap.
-- Build e testes passam.
-- Nenhuma funcionalidade financeira existente e removida.
+- Exclusao segura para entidades financeiras.
+- Bloqueios para dependencias perigosas.
+- Feedback visual para sucesso, erro e bloqueio.
 
-## Fase 2: Exclusao e CRUD Completo
+### Fase 3: Conta Corrente e Saldo Real
 
-### Objetivo
+- Saldo por conta.
+- Resumo de patrimonio.
+- Vinculo de contas a entradas, metas e investimentos.
 
-Permitir manutencao completa dos registros financeiros com exclusao segura e feedback visual.
+### Fase 4: Investimentos e Reservas
 
-Documento da fase aprovada: [finance-phase-2.md](finance-phase-2.md).
+- Campos de rentabilidade, indexador, liquidez e vencimento.
+- Calculo de ganho/perda nominal e percentual.
+- Agrupamento de investimentos.
 
-### Plano
+### Fase 5: UX, Filtros e Organizacao
 
-- Adicionar exclusao para:
-  - contas
-  - entradas
-  - despesas
-  - cartoes
-  - metas
-  - contribuicoes de metas
-  - investimentos
-- Adicionar confirmacao antes de excluir.
-- Bloquear exclusao quando houver dependencias:
-  - cartao com compras vinculadas
-  - conta usada em entrada, meta, contribuicao ou investimento
-  - meta com contribuicoes
-- Exibir mensagem de sucesso, erro ou bloqueio.
-- Preferir bloqueio com explicacao em vez de exclusao em cascata.
+- Melhorias para listas maiores.
+- Filtros e refinamentos de usabilidade.
+- Feedback visual nos fluxos principais.
 
-### Mudancas Tecnicas
+### Fase 6: Persistencia com Backend
 
-- Adicionar metodos `delete...` no `FinanceService`.
-- Adicionar validadores de dependencia no servico.
-- Atualizar a tela para mostrar botoes de exclusao.
-- Manter recalculo de dashboard, faturas e graficos apos exclusao.
+- Camada `FinanceRepository`.
+- `LocalFinanceRepository` preservando comportamento offline.
+- Contrato assincrono por `Observable`.
+- Metadados de sincronizacao nas entidades financeiras.
 
-### Testes e Validacao
+## Integracao Backend Entregue
 
-- Excluir item sem dependencia.
-- Bloquear exclusao de item com dependencia.
-- Confirmar que totais recalculam apos exclusao permitida.
-- Confirmar que registros dependentes nao ficam orfaos.
+### Backend
 
-### Criterios de Aceite
+- Projeto `mxmBackend` atualizado para .NET 10.
+- Entidades `FinanceSnapshot` e `FinanceSyncConflict`.
+- Migration `AddFinanceSnapshotAndSyncConflict`.
+- Endpoints:
+  - `GET /api/health`
+  - `GET /api/finance/state`
+  - `PUT /api/finance/state`
+  - `POST /api/finance/sync`
+- Docker Compose com API + SQL Server.
+- JWT ajustado para claims `sub`, `nameidentifier`, `id` e `email`.
 
-- Usuario consegue excluir registros seguros.
-- Exclusoes perigosas sao bloqueadas com mensagem clara.
-- Build e testes passam.
+### Frontend
 
-## Fase 3: Conta Corrente e Saldo Real
+- `ApiFinanceRepository` integrado a `environment.apiUrl`.
+- `FINANCE_REPOSITORY` como token de injecao para alternar entre API e local.
+- Fallback local sem token ou com falha de API.
+- Migracao local para remoto quando o remoto nao existe.
+- Sync quando local e remoto existem.
+- `serverVersion` salvo em `FinanceState:{usuario}:ServerVersion`.
 
-### Objetivo
+## Validacoes Recentes
 
-Transformar contas em entidades financeiras uteis, calculando saldo por conta e resumo de patrimonio.
+Backend:
 
-Documento da fase aprovada: [finance-phase-3.md](finance-phase-3.md).
+- `dotnet build` passou em `net10.0`.
+- `dotnet ef database update` aplicado no SQL Server em Docker.
+- `GET /api/health` retornou banco acessivel.
+- Snapshot e sync autenticados foram testados manualmente.
 
-### Plano
+Frontend:
 
-- Calcular saldo por conta considerando:
-  - saldo inicial
-  - entradas vinculadas
-  - reservas/metas vinculadas
-  - investimentos vinculados
-- Exibir saldo estimado por conta na aba `Contas`.
-- Exibir resumo de patrimonio no dashboard:
-  - saldo em contas
-  - total investido
-  - total reservado
-  - patrimonio estimado
-- Manter despesas sem conta de origem nesta fase, a menos que seja aprovado expandir o escopo.
+- `npm.cmd test -- --watch=false --browsers=ChromeHeadless` passou com 79 testes.
+- `npm.cmd run build` passou.
 
-### Mudancas Tecnicas
+## Proximas Fases Recomendadas
 
-- Adicionar metodos:
-  - `getAccountBalance(accountId)`
-  - `getAccountsSummary()`
-  - `getNetWorthSummary()`
-- Atualizar dashboard e aba `Contas`.
-- Preservar compatibilidade com dados antigos sem conta vinculada.
+1. Adicionar indicador visual de sincronizacao na tela financeira.
+2. Exibir conflitos de sync quando o backend retornar `conflicts`.
+3. Criar testes automatizados no backend para merge e isolamento por usuario.
+4. Planejar CRUD granular apenas se houver necessidade real de performance, auditoria ou edicao colaborativa mais fina.
 
-### Testes e Validacao
+## Documentos Relacionados
 
-- Entrada aumenta saldo da conta.
-- Investimento vinculado entra no patrimonio.
-- Meta/reserva vinculada aparece no resumo.
-- Conta sem movimentacao mostra saldo inicial.
-
-### Criterios de Aceite
-
-- Aba `Contas` mostra saldo calculado.
-- Dashboard mostra patrimonio estimado.
-- Build e testes passam.
-
-## Fase 4: Investimentos e Reservas
-
-### Objetivo
-
-Melhorar o acompanhamento de CDBs, reservas e outros investimentos.
-
-Documento da fase aprovada: [finance-phase-4.md](finance-phase-4.md).
-
-### Plano
-
-- Adicionar campos opcionais:
-  - rentabilidade/taxa
-  - indexador: CDI, IPCA, Prefixado ou Outro
-  - liquidez: diaria, vencimento ou sem liquidez
-  - vencimento
-- Exibir ganho/perda nominal:
-  - valor atual menos valor aplicado
-  - percentual aproximado
-- Agrupar visualmente:
-  - reserva
-  - CDB
-  - outros investimentos
-- Permitir atualizar valor atual periodicamente.
-
-### Mudancas Tecnicas
-
-- Expandir `Investment`.
-- Atualizar formulario e lista de investimentos.
-- Normalizar estados antigos para novos campos opcionais.
-
-### Testes e Validacao
-
-- Cadastro de CDB com indexador.
-- Calculo de ganho/perda nominal.
-- Edicao de valor atual.
-- Compatibilidade com investimentos antigos.
-
-### Criterios de Aceite
-
-- Usuario acompanha tipo, instituicao, conta, valor aplicado, valor atual e rendimento basico.
-- Build e testes passam.
-
-## Fase 5: UX, Filtros e Organizacao
-
-### Objetivo
-
-Melhorar usabilidade para uso real com listas maiores.
-
-Documento da fase aprovada: [finance-phase-5.md](finance-phase-5.md).
-
-### Plano
-
-- Adicionar filtros por:
-  - mes
-  - categoria
-  - conta
-  - cartao
-  - metodo de pagamento
-- Melhorar listas longas:
-  - ordenacao por data
-  - indicadores de entrada/saida
-  - estados vazios melhores
-- Adicionar feedback visual apos salvar, editar e excluir.
-- Refinar responsividade das abas e cards.
-
-### Mudancas Tecnicas
-
-- Criar estado de filtros no componente.
-- Reaproveitar calculos do `FinanceService`.
-- Evitar filtros que alterem os dados persistidos.
-
-### Testes e Validacao
-
-- Filtrar lancamentos por categoria.
-- Filtrar por conta/cartao.
-- Confirmar estados vazios.
-- Smoke test em mobile e desktop.
-
-### Criterios de Aceite
-
-- Usuario encontra registros com facilidade.
-- Fluxos principais ficam claros em telas pequenas e grandes.
-- Build e testes passam.
-
-## Fase 6: Persistencia com Backend
-
-### Objetivo
-
-Preparar o modulo para sincronizacao real por usuario fora do `localStorage`.
-
-Documento da fase aprovada: [finance-phase-6.md](finance-phase-6.md).
-
-### Plano
-
-- Criar camada `FinanceRepository`.
-- Implementar `LocalFinanceRepository` mantendo comportamento atual.
-- Preparar contrato para `ApiFinanceRepository`.
-- Planejar migracao futura dos dados locais para backend.
-
-### Mudancas Tecnicas
-
-- Isolar persistencia do `FinanceService`.
-- Definir interfaces de leitura/escrita.
-- Manter fallback local durante transicao.
-- Evitar acoplamento do componente ao tipo de persistencia.
-
-### Testes e Validacao
-
-- Servico usando repositorio local.
-- Mock de repositorio API.
-- Persistencia local sem regressao.
-- Plano de migracao documentado.
-
-### Criterios de Aceite
-
-- Troca futura de `localStorage` para backend fica possivel sem reescrever a tela.
-- Build e testes passam.
-
-## Proxima Fase Recomendada
-
-A trilha aprovada do roadmap financeiro foi concluida ate a **Fase 6: Persistencia com Backend**.
-
-A proxima etapa recomendada foi documentada em [finance-backend-integration-plan.md](finance-backend-integration-plan.md).
-
-Ela cobre endpoints, autenticacao, migracao dos dados locais, sincronizacao entre dispositivos e conflitos. A primeira etapa tecnica sugerida e **Preparar Contrato Assincrono**, mas ela deve ser aprovada separadamente antes de qualquer alteracao funcional.
+- [finance-backend-action-plan.md](finance-backend-action-plan.md)
+- [finance-backend-integration-plan.md](finance-backend-integration-plan.md)
+- [csharp-finance-backend-plan.md](csharp-finance-backend-plan.md)
