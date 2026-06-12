@@ -111,6 +111,7 @@ Backend:
 - Snapshot e sync autenticados foram testados manualmente.
 - `dotnet test MxmChallenge.sln --no-restore` passou com 10 testes.
 - Smoke test `scripts\validate-finance-e2e.ps1` validou cadastro, login, snapshot, sync e cleanup contra `http://localhost:8080`.
+- Smoke test `scripts\validate-finance-conflict.ps1` validou merge divergente, conflito retornado e cleanup contra `http://localhost:8080`.
 
 Frontend:
 
