@@ -22,6 +22,7 @@ import {
   PaymentMethod,
 } from '../../models/finance';
 import { FinanceService, toCurrency } from '../../services/finance.service';
+import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 type FinanceTab =
   | 'dashboard'
@@ -77,8 +78,6 @@ export class FinanceComponent implements OnInit {
   editingGoalId = '';
   editingAccountId = '';
   editingInvestmentId = '';
-  feedbackMessage = '';
-  feedbackType: 'success' | 'error' = 'success';
 
   incomeForm = this.fb.group({
     description: ['', [Validators.required, Validators.minLength(3)]],
@@ -162,7 +161,11 @@ export class FinanceComponent implements OnInit {
     cardId: [''],
   });
 
-  constructor(private fb: FormBuilder, private financeService: FinanceService) {}
+  constructor(
+    private fb: FormBuilder,
+    private financeService: FinanceService,
+    private feedbackModal: FeedbackModalService
+  ) {}
 
   ngOnInit(): void {
     this.financeService.state$.subscribe((state) => {
@@ -182,6 +185,7 @@ export class FinanceComponent implements OnInit {
   saveIncome(): void {
     if (this.incomeForm.invalid) {
       this.incomeForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -224,6 +228,7 @@ export class FinanceComponent implements OnInit {
   saveAccount(): void {
     if (this.accountForm.invalid) {
       this.accountForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -263,6 +268,7 @@ export class FinanceComponent implements OnInit {
 
     if (this.expenseForm.invalid) {
       this.expenseForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -325,6 +331,7 @@ export class FinanceComponent implements OnInit {
   saveCard(): void {
     if (this.cardForm.invalid) {
       this.cardForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -357,6 +364,7 @@ export class FinanceComponent implements OnInit {
   saveGoal(): void {
     if (this.goalForm.invalid) {
       this.goalForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -410,6 +418,7 @@ export class FinanceComponent implements OnInit {
   addGoalContribution(): void {
     if (this.contributionForm.invalid) {
       this.contributionForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -424,85 +433,72 @@ export class FinanceComponent implements OnInit {
   }
 
   deleteIncome(incomeId: string): void {
-    if (!this.confirmDelete('Excluir esta entrada?')) {
-      return;
-    }
-
-    this.showDeleteResult(this.financeService.deleteIncome(incomeId));
-    if (this.editingIncomeId === incomeId) {
-      this.cancelIncomeEdit();
-    }
+    this.confirmDelete('Excluir esta entrada?', () => {
+      this.showDeleteResult(this.financeService.deleteIncome(incomeId));
+      if (this.editingIncomeId === incomeId) {
+        this.cancelIncomeEdit();
+      }
+    });
   }
 
   deleteExpense(expenseId: string): void {
-    if (!this.confirmDelete('Excluir esta despesa?')) {
-      return;
-    }
-
-    this.showDeleteResult(this.financeService.deleteExpense(expenseId));
-    if (this.editingExpenseId === expenseId) {
-      this.cancelExpenseEdit();
-    }
+    this.confirmDelete('Excluir esta despesa?', () => {
+      this.showDeleteResult(this.financeService.deleteExpense(expenseId));
+      if (this.editingExpenseId === expenseId) {
+        this.cancelExpenseEdit();
+      }
+    });
   }
 
   deleteAccount(accountId: string): void {
-    if (!this.confirmDelete('Excluir esta conta?')) {
-      return;
-    }
-
-    const result = this.financeService.deleteAccount(accountId);
-    this.showDeleteResult(result);
-    if (result.success && this.editingAccountId === accountId) {
-      this.cancelAccountEdit();
-    }
+    this.confirmDelete('Excluir esta conta?', () => {
+      const result = this.financeService.deleteAccount(accountId);
+      this.showDeleteResult(result);
+      if (result.success && this.editingAccountId === accountId) {
+        this.cancelAccountEdit();
+      }
+    });
   }
 
   deleteCard(cardId: string): void {
-    if (!this.confirmDelete('Excluir este cartao?')) {
-      return;
-    }
-
-    const result = this.financeService.deleteCard(cardId);
-    this.showDeleteResult(result);
-    if (result.success && this.editingCardId === cardId) {
-      this.cancelCardEdit();
-    }
+    this.confirmDelete('Excluir este cartao?', () => {
+      const result = this.financeService.deleteCard(cardId);
+      this.showDeleteResult(result);
+      if (result.success && this.editingCardId === cardId) {
+        this.cancelCardEdit();
+      }
+    });
   }
 
   deleteGoal(goalId: string): void {
-    if (!this.confirmDelete('Excluir esta meta?')) {
-      return;
-    }
-
-    const result = this.financeService.deleteGoal(goalId);
-    this.showDeleteResult(result);
-    if (result.success && this.editingGoalId === goalId) {
-      this.cancelGoalEdit();
-    }
+    this.confirmDelete('Excluir esta meta?', () => {
+      const result = this.financeService.deleteGoal(goalId);
+      this.showDeleteResult(result);
+      if (result.success && this.editingGoalId === goalId) {
+        this.cancelGoalEdit();
+      }
+    });
   }
 
   deleteGoalContribution(goalId: string, contributionId: string): void {
-    if (!this.confirmDelete('Excluir esta contribuicao?')) {
-      return;
-    }
-
-    this.showDeleteResult(this.financeService.deleteGoalContribution(goalId, contributionId));
+    this.confirmDelete('Excluir esta contribuicao?', () => {
+      this.showDeleteResult(this.financeService.deleteGoalContribution(goalId, contributionId));
+    });
   }
 
   deleteInvestment(investmentId: string): void {
-    if (!this.confirmDelete('Excluir este investimento?')) {
-      return;
-    }
-
-    this.showDeleteResult(this.financeService.deleteInvestment(investmentId));
-    if (this.editingInvestmentId === investmentId) {
-      this.cancelInvestmentEdit();
-    }
+    this.confirmDelete('Excluir este investimento?', () => {
+      this.showDeleteResult(this.financeService.deleteInvestment(investmentId));
+      if (this.editingInvestmentId === investmentId) {
+        this.cancelInvestmentEdit();
+      }
+    });
   }
 
   redeemInvestment(): void {
     if (this.redemptionForm.invalid) {
       this.redemptionForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -516,6 +512,7 @@ export class FinanceComponent implements OnInit {
   saveInvestment(): void {
     if (this.investmentForm.invalid) {
       this.investmentForm.markAllAsTouched();
+      this.showInvalidFormWarning();
       return;
     }
 
@@ -673,12 +670,66 @@ export class FinanceComponent implements OnInit {
     return this.financeService.getMonthlySummaries(this.state, this.selectedMonth);
   }
 
+  filteredMonthlySummaries() {
+    return this.monthlySummaries().map((summary) => {
+      const launches = this.financeService
+        .getMonthlyLaunches(summary.month, this.state)
+        .filter((launch) => this.matchesLaunchFilters(launch));
+      const income = launches
+        .filter((launch) => launch.type === 'income')
+        .reduce((total, launch) => total + Number(launch.amount || 0), 0);
+      const expense = launches
+        .filter((launch) => launch.type !== 'income')
+        .reduce((total, launch) => total + Math.abs(Number(launch.amount || 0)), 0);
+
+      return {
+        ...summary,
+        income,
+        expense,
+        balance: income - expense,
+      };
+    });
+  }
+
   categoryTotals() {
     return this.financeService.getCategoryTotals(this.selectedMonth, this.state);
   }
 
+  filteredCategoryTotals(): Array<{ category: string; total: number }> {
+    const totals = new Map<string, number>();
+
+    for (const launch of this.filteredMonthlyLaunches()) {
+      if (launch.type === 'income') {
+        continue;
+      }
+
+      totals.set(launch.category, (totals.get(launch.category) || 0) + Math.abs(Number(launch.amount || 0)));
+    }
+
+    return Array.from(totals.entries())
+      .map(([category, total]) => ({ category, total }))
+      .sort((a, b) => b.total - a.total);
+  }
+
   paymentMethodTotals() {
     return this.financeService.getPaymentMethodTotals(this.selectedMonth, this.state);
+  }
+
+  filteredPaymentMethodTotals(): Array<{ method: string; total: number }> {
+    const totals = new Map<string, number>();
+
+    for (const launch of this.filteredMonthlyLaunches()) {
+      if (launch.type === 'income') {
+        continue;
+      }
+
+      const label = launch.paymentMethod ? this.paymentMethodLabel(launch.paymentMethod) : launch.paymentLabel;
+      totals.set(label, (totals.get(label) || 0) + Math.abs(Number(launch.amount || 0)));
+    }
+
+    return Array.from(totals.entries())
+      .map(([method, total]) => ({ method, total }))
+      .sort((a, b) => b.total - a.total);
   }
 
   paymentSourceOptions(): PaymentSourceOption[] {
@@ -697,7 +748,7 @@ export class FinanceComponent implements OnInit {
   }
 
   barHeight(total: number): number {
-    const max = Math.max(...this.monthlySummaries().map((item) => item.expense), 1);
+    const max = Math.max(...this.filteredMonthlySummaries().map((item) => item.expense), 1);
     return Math.max((total / max) * 160, 8);
   }
 
@@ -792,13 +843,25 @@ export class FinanceComponent implements OnInit {
     return toCurrency(value);
   }
 
-  private confirmDelete(message: string): boolean {
-    return window.confirm(message);
+  private confirmDelete(message: string, onConfirm: () => void): void {
+    this.feedbackModal.confirm(message, 'Confirmar exclusao').subscribe((confirmed) => {
+      if (confirmed) {
+        onConfirm();
+      }
+    });
   }
 
   private showDeleteResult(result: { success: boolean; message: string }): void {
-    this.feedbackMessage = result.message;
-    this.feedbackType = result.success ? 'success' : 'error';
+    if (result.success) {
+      this.feedbackModal.showSuccess(result.message, 'Acao concluida');
+      return;
+    }
+
+    this.feedbackModal.showError(result.message, 'Nao foi possivel concluir');
+  }
+
+  private showInvalidFormWarning(): void {
+    this.feedbackModal.showWarning('Revise os campos obrigatorios antes de continuar.', 'Formulario invalido');
   }
 
   private matchesLaunchFilters(launch: FinanceLaunch): boolean {

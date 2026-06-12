@@ -2,36 +2,40 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 @Component({
-    selector: 'app-deleteprofile',
-    imports: [SidebarComponent],
-    templateUrl: './deleteprofile.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './deleteprofile.component.css'
+  selector: 'app-deleteprofile',
+  imports: [SidebarComponent],
+  templateUrl: './deleteprofile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './deleteprofile.component.css',
 })
 export class DeleteprofileComponent {
-  feedbackMessage = '';
   isDeleting = false;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private feedbackModal: FeedbackModalService
+  ) {}
 
   confirmarExclusao() {
     if (this.authService.isLoggedIn()) {
       this.isDeleting = true;
       this.authService.deleteProfile().subscribe({
         next: () => {
-          this.feedbackMessage = 'Perfil excluído com sucesso.';
+          this.feedbackModal.showSuccess('Perfil excluido com sucesso.', 'Perfil excluido');
           this.authService.logout();
           this.router.navigate(['/home']);
         },
         error: () => {
-          this.feedbackMessage = 'Não foi possível excluir o perfil. Tente novamente.';
+          this.feedbackModal.showError('Nao foi possivel excluir o perfil. Tente novamente.', 'Erro ao excluir');
           this.isDeleting = false;
         },
       });
     } else {
-      this.feedbackMessage = 'Token de autenticação ausente.';
+      this.feedbackModal.showError('Token de autenticacao ausente.', 'Sessao invalida');
     }
   }
 

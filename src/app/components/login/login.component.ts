@@ -1,31 +1,26 @@
-
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 @Component({
-    selector: 'app-login',
-    imports: [ReactiveFormsModule, RouterLink],
-    templateUrl: './login.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './login.component.css'
+  selector: 'app-login',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './login.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
   form!: FormGroup;
-  public showPassword: boolean = false;
-  errorMessage: string | null = null;
-  isLoading: boolean = false;
+  public showPassword = false;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private feedbackModal: FeedbackModalService
   ) {}
 
   ngOnInit() {
@@ -44,8 +39,8 @@ export class LoginComponent implements OnInit {
         },
         error: (err) => {
           console.error('Authentication error:', err);
-          this.errorMessage = 'Erro ao autenticar o usuário. Por favor, tente novamente.';
-            this.isLoading = false;
+          this.feedbackModal.showError('Erro ao autenticar o usuario. Por favor, tente novamente.', 'Erro no login');
+          this.isLoading = false;
         },
         complete: () => {
           this.isLoading = false;
@@ -54,7 +49,7 @@ export class LoginComponent implements OnInit {
       this.form.reset();
     } else {
       this.isLoading = false;
-      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
+      this.feedbackModal.showWarning('Por favor, preencha todos os campos corretamente.', 'Formulario invalido');
     }
   }
 }

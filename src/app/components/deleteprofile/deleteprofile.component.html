@@ -13,12 +13,6 @@
         Ao confirmar, seus dados de perfil serão removidos. Revise com cuidado antes de continuar.
       </p>
 
-      @if (feedbackMessage) {
-        <div class="alert alert-danger" role="alert">
-          {{ feedbackMessage }}
-        </div>
-      }
-
       <div class="delete-actions">
         <button class="btn btn-secondary" type="button" [disabled]="isDeleting" (click)="cancelarExclusao()">
           Cancelar

@@ -1,0 +1,31 @@
+@if (state.open) {
+  <div class="modal-backdrop" (click)="close()" aria-hidden="true"></div>
+  <section
+    class="feedback-modal"
+    [class.success]="state.type === 'success'"
+    [class.error]="state.type === 'error'"
+    [class.warning]="state.type === 'warning'"
+    [class.confirm]="state.type === 'confirm'"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feedback-modal-title"
+  >
+    <button class="modal-close" type="button" [attr.aria-label]="state.closeLabel" (click)="close()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="modal-icon" aria-hidden="true">
+      <i [class]="'bi ' + iconClass()"></i>
+    </div>
+
+    <h2 id="feedback-modal-title">{{ state.title }}</h2>
+    <p>{{ state.message }}</p>
+
+    <div class="modal-actions">
+      @if (state.type === 'confirm') {
+        <button class="btn btn-outline-secondary" type="button" (click)="cancel()">{{ state.cancelLabel }}</button>
+      }
+      <button #primaryButton class="btn btn-primary" type="button" (click)="confirm()">{{ state.confirmLabel }}</button>
+    </div>
+  </section>
+}

@@ -2,11 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BrowserStorageService } from '../../services/browser-storage.service';
+import { FeedbackModalService, FeedbackModalState } from '../../services/feedback-modal.service';
 import { FinanceComponent } from './finance.component';
 
 describe('FinanceComponent', () => {
   let component: FinanceComponent;
   let fixture: ComponentFixture<FinanceComponent>;
+  let feedbackModal: FeedbackModalService;
+  let modalState = {} as FeedbackModalState;
 
   beforeEach(async () => {
     const auth = jasmine.createSpyObj<AuthService>('AuthService', ['getStoredUserName', 'logout']);
@@ -26,6 +29,10 @@ describe('FinanceComponent', () => {
 
     fixture = TestBed.createComponent(FinanceComponent);
     component = fixture.componentInstance;
+    feedbackModal = TestBed.inject(FeedbackModalService);
+    feedbackModal.state$.subscribe((state) => {
+      modalState = state;
+    });
     fixture.detectChanges();
   });
 
@@ -99,6 +106,14 @@ describe('FinanceComponent', () => {
     expect(component.expenseForm.valid).toBeTrue();
     expect(component.isCreditCardPayment()).toBeTrue();
     expect(component.expenseForm.get('cardId')?.value).toBe(card.id);
+  });
+
+  it('opens a warning modal when submitting an invalid finance form', () => {
+    component.saveExpense();
+
+    expect(modalState.open).toBeTrue();
+    expect(modalState.type).toBe('warning');
+    expect(modalState.title).toBe('Formulario invalido');
   });
 
   it('does not duplicate account or card names in payment source labels', () => {
@@ -246,7 +261,7 @@ describe('FinanceComponent', () => {
     });
     component.redeemInvestment();
 
-    expect(component.feedbackType).toBe('success');
+    expect(modalState.type).toBe('success');
     expect(component.state.investments[0].currentAmount).toBe(600);
     expect(component.state.investments[0].investedAmount).toBe(600);
     expect(component.redemptionForm.get('amount')?.value).toBe(0);
@@ -331,8 +346,58 @@ describe('FinanceComponent', () => {
     expect(component.filteredMonthlyExpenses().length).toBe(1);
   });
 
+  it('calculates chart values from consolidated filtered monthly launches', () => {
+    component.accountForm.patchValue({
+      bankName: 'Banco Teste',
+      accountName: 'Principal',
+      accountType: 'Conta corrente',
+      initialBalance: 0,
+    });
+    component.saveAccount();
+    component.cardForm.patchValue({ name: 'Cartao Teste', limit: 3000, closingDay: 1, dueDay: 10 });
+    component.saveCard();
+    const account = component.state.accounts[0];
+    const card = component.state.cards[0];
+
+    component.expenseForm.patchValue({
+      description: 'Mercado',
+      category: 'Outros',
+      amount: 150,
+      date: '2026-05-10',
+      paymentSource: `pix:${account.id}`,
+      installments: 1,
+    });
+    component.onPaymentMethodChange();
+    component.saveExpense();
+
+    component.expenseForm.patchValue({
+      description: 'Notebook',
+      category: 'Outros',
+      amount: 900,
+      date: '2026-05-12',
+      paymentSource: `card:${card.id}`,
+      installments: 3,
+    });
+    component.onPaymentMethodChange();
+    component.saveExpense();
+    component.selectedMonth = '2026-05';
+
+    const maySummary = component.filteredMonthlySummaries().find((summary) => summary.month === '2026-05');
+    const categoryTotal = component.filteredCategoryTotals().find((item) => item.category === 'Outros');
+    const paymentTotals = component.filteredPaymentMethodTotals();
+
+    expect(maySummary?.expense).toBe(450);
+    expect(categoryTotal?.total).toBe(450);
+    expect(paymentTotals.find((item) => item.method === 'Pix')?.total).toBe(150);
+    expect(paymentTotals.reduce((total, item) => total + item.total, 0)).toBe(450);
+
+    component.filterForm.patchValue({ paymentMethod: 'credit-card' });
+
+    expect(component.filteredCategoryTotals()[0].total).toBe(300);
+    expect(component.filteredPaymentMethodTotals()[0].total).toBe(300);
+  });
+
   it('deletes a launch only after confirmation and shows success feedback', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
     component.incomeForm.patchValue({
       description: 'Freela',
       category: 'Freelance',
@@ -345,26 +410,29 @@ describe('FinanceComponent', () => {
 
     component.deleteIncome(income.id);
 
-    expect(window.confirm).toHaveBeenCalled();
+    expect(component.state.incomes.length).toBe(1);
+    expect(modalState.type).toBe('confirm');
+
+    feedbackModal.confirmAction();
+
     expect(component.state.incomes.length).toBe(0);
-    expect(component.feedbackType).toBe('success');
-    expect(component.feedbackMessage).toContain('excluida');
+    expect(modalState.type).toBe('success');
+    expect(modalState.message).toContain('excluida');
   });
 
   it('keeps the record when deletion is not confirmed', () => {
-    spyOn(window, 'confirm').and.returnValue(false);
     component.cardForm.patchValue({ name: 'Principal', limit: 2000, closingDay: 1, dueDay: 10 });
     component.saveCard();
     const card = component.state.cards[0];
 
     component.deleteCard(card.id);
+    feedbackModal.cancelAction();
 
     expect(component.state.cards.length).toBe(1);
-    expect(component.feedbackMessage).toBe('');
+    expect(modalState.open).toBeFalse();
   });
 
   it('shows error feedback when deleting a linked account is blocked', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
     component.accountForm.patchValue({
       bankName: 'Banco Teste',
       accountName: 'Principal',
@@ -385,10 +453,11 @@ describe('FinanceComponent', () => {
     component.saveIncome();
 
     component.deleteAccount(account.id);
+    feedbackModal.confirmAction();
 
     expect(component.state.accounts.length).toBe(1);
-    expect(component.feedbackType).toBe('error');
-    expect(component.feedbackMessage).toContain('vinculada');
+    expect(modalState.type).toBe('error');
+    expect(modalState.message).toContain('vinculada');
   });
 
   it('shows account and net worth summaries for the selected month', () => {

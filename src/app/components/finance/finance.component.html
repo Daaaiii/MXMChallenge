@@ -25,12 +25,6 @@
       <button type="button" [class.active]="activeTab === 'charts'" (click)="setTab('charts')">Gráficos</button>
     </nav>
 
-    @if (feedbackMessage) {
-      <div class="finance-alert" [class.success]="feedbackType === 'success'" [class.error]="feedbackType === 'error'">
-        {{ feedbackMessage }}
-      </div>
-    }
-
     <section class="finance-panel surface-card finance-filters">
       <div class="filter-heading">
         <h2>Filtros</h2>
@@ -624,7 +618,7 @@
         <article class="finance-panel surface-card">
           <h2>Evolução mensal</h2>
           <div class="bar-chart" aria-label="Gráfico de saídas mensais">
-            @for (month of monthlySummaries(); track month.month) {
+            @for (month of filteredMonthlySummaries(); track month.month) {
               <div class="bar-column"><div class="bar-value">{{ currency(month.expense) }}</div><div class="bar" [style.height.px]="barHeight(month.expense)"></div><span>{{ month.label }}</span></div>
             }
           </div>
@@ -633,10 +627,21 @@
         <article class="finance-panel surface-card">
           <h2>Gastos por categoria</h2>
           <div class="category-list">
-            @for (item of categoryTotals(); track item.category) {
+            @for (item of filteredCategoryTotals(); track item.category) {
               <div class="category-row"><span>{{ item.category }}</span><strong>{{ currency(item.total) }}</strong></div>
             } @empty {
               <p class="empty-state">Nenhuma categoria com gastos.</p>
+            }
+          </div>
+        </article>
+
+        <article class="finance-panel surface-card">
+          <h2>Gastos por forma de pagamento</h2>
+          <div class="category-list">
+            @for (item of filteredPaymentMethodTotals(); track item.method) {
+              <div class="category-row"><span>{{ item.method }}</span><strong>{{ currency(item.total) }}</strong></div>
+            } @empty {
+              <p class="empty-state">Nenhuma forma de pagamento com gastos.</p>
             }
           </div>
         </article>

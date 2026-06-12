@@ -1,5 +1,4 @@
-
-import { ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,14 +13,14 @@ import { SearchCepService } from '../../services/search-cep.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AuthService } from '../../services/auth.service';
 import { RegisterFormDataDTO } from '../../models/authDTO';
-
+import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 @Component({
-    selector: 'app-register',
-    imports: [ReactiveFormsModule, NavbarComponent, RouterLink],
-    templateUrl: './register.component.html',
-    styleUrl: './register.component.css',
-    changeDetection: ChangeDetectionStrategy.Eager
+  selector: 'app-register',
+  imports: [ReactiveFormsModule, NavbarComponent, RouterLink],
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class RegisterComponent {
   private destroyRef = inject(DestroyRef);
@@ -32,16 +31,18 @@ export class RegisterComponent {
     private cdr: ChangeDetectorRef,
     private cepService: SearchCepService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private feedbackModal: FeedbackModalService
   ) {}
+
   isLoading = false;
-  page= 'Login';
-  route= '/home';
+  page = 'Login';
+  route = '/home';
   form!: FormGroup;
   errorMessage: string | null = '';
-  public showPassword: boolean = false;
-  public showPasswordConfirmation: boolean = false;
-  searchAttempted: boolean = false;
+  public showPassword = false;
+  public showPasswordConfirmation = false;
+  searchAttempted = false;
 
   ddds: number[] = [
     11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28, 31, 32, 33, 34, 35,
@@ -51,62 +52,13 @@ export class RegisterComponent {
   ];
 
   ufs: string[] = [
-    'AC',
-    'AL',
-    'AM',
-    'AP',
-    'BA',
-    'CE',
-    'DF',
-    'ES',
-    'GO',
-    'MA',
-    'MG',
-    'MS',
-    'MT',
-    'PA',
-    'PB',
-    'PE',
-    'PI',
-    'PR',
-    'RJ',
-    'RN',
-    'RO',
-    'RR',
-    'RS',
-    'SC',
-    'SE',
-    'SP',
-    'TO',
+    'AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT',
+    'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO',
   ];
+
   @Output() formCompleted = new EventEmitter<void>();
-  onSubmit() {
-    
-    if (this.form.valid) {
-      this.isLoading = true;
-      this.formCompleted.emit();
-      this.authService.register(this.form.value).subscribe({
-        next: () => {       
-          this.router.navigate(['/register-success']);
-        },
-        error: (err) => {
-          this.errorMessage = err.error.message || 'Erro ao cadastrar usuário. Por favor, tente novamente.';
-          this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
-        },
-      });
-      this.form.reset();
-    } else {
-      this.errorMessage = 'Por favor, preencha todos os campos corretamente.';
-      this.isLoading = false;
-    }
-  }
-  
 
   ngOnInit() {
-   
     this.form = this.fb.group(
       {
         fullname: new FormControl('', [
@@ -115,11 +67,7 @@ export class RegisterComponent {
           Validators.maxLength(100),
           nameValidator(),
         ]),
-        ddd: new FormControl('', [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(2),
-        ]),
+        ddd: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]),
         phoneNumber: new FormControl('', [
           Validators.required,
           Validators.minLength(9),
@@ -146,11 +94,7 @@ export class RegisterComponent {
           Validators.minLength(8),
           cepValidator(),
         ]),
-        state: new FormControl('', [
-          Validators.required,
-          Validators.maxLength(2),
-          Validators.minLength(2),
-        ]),
+        state: new FormControl('', [Validators.required, Validators.maxLength(2), Validators.minLength(2)]),
         city: new FormControl('', [Validators.required]),
         street: new FormControl('', [Validators.required]),
         complement: new FormControl(''),
@@ -160,12 +104,11 @@ export class RegisterComponent {
       { validators: [confirmPasswordValidator()] }
     );
 
-    this.form.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((values: Partial<RegisterFormDataDTO>) => {
-        this.formService.setFormData(values);
-      });
-    this.formService.getFormData()
+    this.form.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((values: Partial<RegisterFormDataDTO>) => {
+      this.formService.setFormData(values);
+    });
+    this.formService
+      .getFormData()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         if (data) {
@@ -173,7 +116,29 @@ export class RegisterComponent {
         }
       });
   }
-  
+
+  onSubmit() {
+    if (this.form.valid) {
+      this.isLoading = true;
+      this.formCompleted.emit();
+      this.authService.register(this.form.value).subscribe({
+        next: () => {
+          this.router.navigate(['/register-success']);
+        },
+        error: (err) => {
+          this.feedbackModal.showError(err.error.message || 'Erro ao cadastrar usuario. Por favor, tente novamente.', 'Erro no cadastro');
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
+      });
+      this.form.reset();
+    } else {
+      this.feedbackModal.showWarning('Por favor, preencha todos os campos corretamente.', 'Formulario invalido');
+      this.isLoading = false;
+    }
+  }
 
   searchCEP() {
     this.searchAttempted = false;
@@ -185,7 +150,7 @@ export class RegisterComponent {
       this.cepService.buscarCEP(cep).subscribe({
         next: (data) => {
           if (data.erro) {
-            this.errorMessage = 'CEP não encontrado.';
+            this.errorMessage = 'CEP nao encontrado.';
           } else {
             this.form.patchValue({
               state: data.uf,
@@ -197,13 +162,12 @@ export class RegisterComponent {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.errorMessage =
-            'Erro ao buscar o CEP. Por favor, tente novamente.';
+          this.errorMessage = 'Erro ao buscar o CEP. Por favor, tente novamente.';
           this.cdr.detectChanges();
         },
       });
     } else {
-      this.errorMessage = 'Formato de CEP inválido.';
+      this.errorMessage = 'Formato de CEP invalido.';
       this.searchAttempted = true;
     }
   }

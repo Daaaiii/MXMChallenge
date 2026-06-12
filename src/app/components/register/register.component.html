@@ -265,10 +265,6 @@
       </div>
     </section>
 
-    @if (errorMessage && !searchAttempted) {
-      <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
-    }
-
     <div class="form-actions">
       <a routerLink="/home">Já está cadastrado?</a>
       <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isLoading">

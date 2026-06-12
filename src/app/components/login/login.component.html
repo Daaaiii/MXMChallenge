@@ -4,12 +4,6 @@
     <h2>Login</h2>
   </div>
 
-  @if (errorMessage) {
-    <div class="alert alert-danger" role="alert">
-      {{ errorMessage }}
-    </div>
-  }
-
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
