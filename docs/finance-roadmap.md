@@ -89,6 +89,7 @@ dotnet ef database update
 - Docker Compose com API + SQL Server.
 - JWT ajustado para claims `sub`, `nameidentifier`, `id` e `email`.
 - Testes automatizados para regras de merge e isolamento por usuario nos endpoints financeiros.
+- Testes automatizados para emissao e leitura de claims JWT usados pelo modulo financeiro.
 
 ### Frontend
 
@@ -109,7 +110,7 @@ Backend:
 - `dotnet ef database update` aplicado no SQL Server em Docker.
 - `GET /api/health` retornou banco acessivel.
 - Snapshot e sync autenticados foram testados manualmente.
-- `dotnet test MxmChallenge.sln --no-restore` passou com 10 testes.
+- `dotnet test MxmChallenge.sln --no-restore` passou com 13 testes.
 - Smoke test `scripts\validate-finance-e2e.ps1` validou cadastro, login, snapshot, sync e cleanup contra `http://localhost:8080`.
 - Smoke test `scripts\validate-finance-conflict.ps1` validou merge divergente, conflito retornado e cleanup contra `http://localhost:8080`.
 
